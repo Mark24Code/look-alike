@@ -455,22 +455,45 @@ const QuickCompare: React.FC = () => {
                         );
                     }
 
-                    // No candidates available
+                    // No candidates available - this should never happen with adaptive matching
                     if (!Array.isArray(candidates) || candidates.length === 0) {
                         return (
-                            <div
-                                style={{
-                                    width: 140,
-                                    height: 140,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid #ddd',
-                                    margin: '0 auto'
-                                }}
-                            >
-                                <span style={{ color: '#ccc' }}>无候选项</span>
-                            </div>
+                            <Space direction="vertical" align="center" style={{ width: '100%' }}>
+                                <div
+                                    style={{
+                                        width: 140,
+                                        height: 140,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #ddd',
+                                    }}
+                                >
+                                    <span style={{ color: '#ccc' }}>无候选项</span>
+                                </div>
+                                <Button
+                                    size="small"
+                                    danger
+                                    onClick={async () => {
+                                        try {
+                                            await markNoMatch(projectId, record.source_file_id, target!.id);
+                                            setTableData(prev => prev.map(item => {
+                                                if (item.source_file_id === record.source_file_id) {
+                                                    const newTargetSelections = { ...item.target_selections };
+                                                    newTargetSelections[key] = { no_match: true, selected_candidate_id: undefined };
+                                                    return { ...item, target_selections: newTargetSelections };
+                                                }
+                                                return item;
+                                            }));
+                                            message.success('已标记为无匹配');
+                                        } catch (e) {
+                                            message.error('操作失败');
+                                        }
+                                    }}
+                                >
+                                    标记无匹配
+                                </Button>
+                            </Space>
                         );
                     }
 
@@ -511,14 +534,39 @@ const QuickCompare: React.FC = () => {
                                     }}
                                 />
                             </div>
-                            <div style={{ textAlign: 'center', fontSize: 11 }}>
+                            <div style={{ textAlign: 'center', fontSize: 11, width: '100%' }}>
                                 <div>相似度: {displayCand.similarity.toFixed(2)}%</div>
                                 <div style={{ color: '#888' }}>{displayCand.width} × {displayCand.height}</div>
-                                {candidates.length > 1 && (
-                                    <a onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, targetSelection?.selected_candidate_id)}>
-                                        查看全部 {candidates.length} 个
-                                    </a>
-                                )}
+                                <Space direction="horizontal" size={4} style={{ marginTop: 4, justifyContent: 'center' }}>
+                                    {candidates.length > 1 && (
+                                        <a onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, targetSelection?.selected_candidate_id)}>
+                                            全部 {candidates.length} 个
+                                        </a>
+                                    )}
+                                    <Button
+                                        size="small"
+                                        danger
+                                        type="text"
+                                        onClick={async () => {
+                                            try {
+                                                await markNoMatch(projectId, record.source_file_id, target!.id);
+                                                setTableData(prev => prev.map(item => {
+                                                    if (item.source_file_id === record.source_file_id) {
+                                                        const newTargetSelections = { ...item.target_selections };
+                                                        newTargetSelections[key] = { no_match: true, selected_candidate_id: undefined };
+                                                        return { ...item, target_selections: newTargetSelections };
+                                                    }
+                                                    return item;
+                                                }));
+                                                message.success('已标记为无匹配');
+                                            } catch (e) {
+                                                message.error('操作失败');
+                                            }
+                                        }}
+                                    >
+                                        无匹配
+                                    </Button>
+                                </Space>
                             </div>
                         </Space>
                     );
@@ -658,32 +706,102 @@ const QuickCompare: React.FC = () => {
                 open={modalVisible}
                 onOk={handleModalOk}
                 onCancel={() => setModalVisible(false)}
-                width={800}
+                width={900}
                 okText="确定"
                 cancelText="取消"
+                bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
             >
-                <Radio.Group onChange={e => setSelectedCandidateInModal(e.target.value)} value={selectedCandidateInModal} style={{ width: '100%' }}>
+                <Radio.Group
+                    onChange={e => setSelectedCandidateInModal(e.target.value)}
+                    value={selectedCandidateInModal}
+                    style={{ width: '100%' }}
+                >
                     <List
                         dataSource={currentCandidates}
-                        renderItem={(item) => (
-                            <List.Item>
-                                <Radio value={item.id} style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                                    <Space size="large">
-                                        <Image src={`/api/image?path=${encodeURIComponent(item.path)}`} width={100} />
-                                        <div style={{ minWidth: 200 }}>
-                                            <div>相似度: {item.similarity.toFixed(2)}%</div>
-                                            <div>尺寸: {item.width} x {item.height}</div>
-                                            <div style={{ fontSize: 12, color: '#999', wordBreak: 'break-all' }}>{item.path}</div>
+                        size="small"
+                        bordered
+                        renderItem={(item, index) => (
+                            <List.Item
+                                style={{
+                                    padding: '8px 12px',
+                                    cursor: 'pointer',
+                                    backgroundColor: selectedCandidateInModal === item.id ? '#e6f7ff' : 'transparent'
+                                }}
+                                onClick={() => setSelectedCandidateInModal(item.id)}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
+                                    <Radio value={item.id} />
+                                    <div style={{
+                                        width: 80,
+                                        height: 80,
+                                        flexShrink: 0,
+                                        backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
+                                        backgroundSize: '10px 10px',
+                                        backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #d9d9d9',
+                                        borderRadius: 4,
+                                        overflow: 'hidden'
+                                    }}>
+                                        <Image
+                                            src={`/api/image?path=${encodeURIComponent(item.path)}`}
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: '100%',
+                                                objectFit: 'contain'
+                                            }}
+                                            preview={{
+                                                mask: '预览'
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            marginBottom: 4
+                                        }}>
+                                            <span style={{
+                                                fontWeight: 500,
+                                                fontSize: 13,
+                                                color: item.similarity >= 80 ? '#52c41a' : item.similarity >= 60 ? '#faad14' : '#ff4d4f'
+                                            }}>
+                                                #{index + 1} - 相似度: {item.similarity.toFixed(2)}%
+                                            </span>
+                                            <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                                                {item.width} × {item.height}
+                                            </span>
                                         </div>
-                                    </Space>
-                                </Radio>
+                                        <div style={{
+                                            fontSize: 12,
+                                            color: '#595959',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }} title={item.path}>
+                                            {item.path}
+                                        </div>
+                                    </div>
+                                </div>
                             </List.Item>
                         )}
                     />
-                    <List.Item>
+                    <List.Item
+                        style={{
+                            padding: '12px',
+                            cursor: 'pointer',
+                            backgroundColor: selectedCandidateInModal === -1 ? '#fff1f0' : 'transparent',
+                            borderTop: '2px solid #f0f0f0',
+                            marginTop: 8
+                        }}
+                        onClick={() => setSelectedCandidateInModal(-1)}
+                    >
                         <Radio value={-1} style={{ width: '100%' }}>
-                            <div style={{ padding: '10px 0', color: '#999' }}>
-                                <strong>无匹配</strong> - 该source图片在此目标列没有合适的匹配
+                            <div style={{ padding: '4px 0', color: '#ff4d4f', fontWeight: 500 }}>
+                                无匹配 - 该源图片在此目标列没有合适的匹配
                             </div>
                         </Radio>
                     </List.Item>

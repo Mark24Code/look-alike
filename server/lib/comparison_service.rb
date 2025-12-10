@@ -70,12 +70,12 @@ class ComparisonService
       # 获取所有target文件（避免 N+1 查询，在外层已经 includes）
       all_targets = target.target_files.to_a
 
-      # 第一步：尺寸筛选
-      filtered_targets = DimensionFilter.filter_targets(source_file, all_targets)
+      # 第一步：自适应尺寸筛选
+      filtered_targets = DimensionFilter.adaptive_filter_targets(source_file, all_targets)
 
-      puts "Source #{source_file.relative_path}: #{all_targets.size} targets -> #{filtered_targets.size} after dimension filter"
+      puts "Source #{source_file.relative_path}: #{all_targets.size} targets -> #{filtered_targets.size} after adaptive dimension filter"
 
-      # 第二步：哈希比较
+      # 第二步：哈希比较，使用自适应阈值
       candidates = []
 
       filtered_targets.each do |tf|
@@ -83,23 +83,45 @@ class ComparisonService
           # 使用预计算的哈希值
           similarity = calculate_similarity_from_hashes(source_file, tf)
 
-          if similarity > 50.0
-            candidates << {
-              target_file: tf,
-              similarity: similarity
-            }
-          end
+          # 先收集所有相似度数据
+          candidates << {
+            target_file: tf,
+            similarity: similarity
+          }
         rescue => e
           puts "Error comparing with target #{tf.id}: #{e.message}"
           next
         end
       end
 
-      # 排序并取前10
+      # 排序
       candidates.sort_by! { |c| -c[:similarity] }
 
+      # 自适应阈值策略：确保至少有一个候选项
+      similarity_thresholds = [50.0, 40.0, 30.0, 20.0, 10.0, 0.0]
+      final_candidates = []
+      used_threshold = 50.0
+
+      similarity_thresholds.each do |threshold|
+        filtered = candidates.select { |c| c[:similarity] > threshold }
+
+        if filtered.any?
+          # 限制最多20个候选项
+          final_candidates = filtered.first(20)
+          used_threshold = threshold
+          break
+        end
+      end
+
+      # 如果所有阈值都没有结果，强制选择相似度最高的1个
+      if final_candidates.empty? && candidates.any?
+        final_candidates = [candidates.first]
+        used_threshold = 0.0
+        puts "  强制选择最高相似度候选项: #{candidates.first[:similarity].round(2)}%"
+      end
+
       # 准备批量插入数据
-      candidates.first(10).each_with_index do |cand, index|
+      final_candidates.each_with_index do |cand, index|
         record = {
           source_file_id: source_file.id,
           project_target_id: target.id,
@@ -121,7 +143,7 @@ class ComparisonService
         end
       end
 
-      puts "Found #{candidates.first(10).size} candidates for #{source_file.relative_path} in #{target.name}"
+      puts "Found #{final_candidates.size} candidates for #{source_file.relative_path} in #{target.name} (threshold: #{used_threshold}%)"
 
       # 及时释放 candidates 数组的内存引用
       candidates = nil
