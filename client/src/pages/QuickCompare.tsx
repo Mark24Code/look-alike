@@ -837,102 +837,97 @@ const QuickCompare: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* 右侧：候选列表 - 可滚动 */}
-                    <div style={{ flex: 1, minWidth: 0, maxHeight: '70vh', overflowY: 'auto' }}>
+                    {/* 右侧：候选列表 */}
+                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                         <Radio.Group
                             onChange={e => setSelectedCandidateInModal(e.target.value)}
                             value={selectedCandidateInModal}
-                            style={{ width: '100%' }}
+                            style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%' }}
                         >
-                            <List
-                                dataSource={currentCandidates}
-                                size="small"
-                                bordered
-                                renderItem={(item, index) => (
-                                    <List.Item
-                                        style={{
-                                            padding: '8px 12px',
-                                            cursor: 'pointer',
-                                            backgroundColor: selectedCandidateInModal === item.id ? '#e6f7ff' : 'transparent'
-                                        }}
-                                        onClick={() => setSelectedCandidateInModal(item.id)}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
-                                            <Radio value={item.id} />
-                                            <div style={{
-                                                width: 80,
-                                                height: 80,
-                                                flexShrink: 0,
-                                                backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
-                                                backgroundSize: '10px 10px',
-                                                backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                border: '1px solid #d9d9d9',
-                                                borderRadius: 4,
-                                                overflow: 'hidden'
-                                            }}>
-                                                <Image
-                                                    src={`/api/image?path=${encodeURIComponent(item.path)}`}
-                                                    style={{
-                                                        maxWidth: '100%',
-                                                        maxHeight: '100%',
-                                                        objectFit: 'contain'
-                                                    }}
-                                                    preview={{
-                                                        mask: '预览'
-                                                    }}
-                                                />
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    marginBottom: 4
-                                                }}>
-                                                    <span style={{
-                                                        fontWeight: 500,
-                                                        fontSize: 13,
-                                                        color: item.similarity >= 80 ? '#52c41a' : item.similarity >= 60 ? '#faad14' : '#ff4d4f'
-                                                    }}>
-                                                        #{index + 1} - 相似度: {item.similarity.toFixed(2)}%
-                                                    </span>
-                                                    <span style={{ fontSize: 12, color: '#8c8c8c' }}>
-                                                        {item.width} × {item.height}
-                                                    </span>
-                                                </div>
-                                                <div style={{
-                                                    fontSize: 12,
-                                                    color: '#595959',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    whiteSpace: 'nowrap'
-                                                }} title={item.path}>
-                                                    {item.path}
-                                                </div>
-                                            </div>
+                            {/* 无匹配选项 - 固定在顶部 */}
+                            <List size="small" bordered style={{ flexShrink: 0 }}>
+                                <List.Item
+                                    style={{
+                                        padding: '12px',
+                                        cursor: 'pointer',
+                                        backgroundColor: selectedCandidateInModal === -1 ? '#fff1f0' : 'transparent'
+                                    }}
+                                    onClick={() => setSelectedCandidateInModal(-1)}
+                                >
+                                    <Radio value={-1} style={{ width: '100%' }}>
+                                        <div style={{ padding: '4px 0', color: '#ff4d4f', fontWeight: 500 }}>
+                                            无匹配
                                         </div>
-                                    </List.Item>
-                                )}
-                            />
-                            <List.Item
-                                style={{
-                                    padding: '12px',
-                                    cursor: 'pointer',
-                                    backgroundColor: selectedCandidateInModal === -1 ? '#fff1f0' : 'transparent',
-                                    borderTop: '2px solid #f0f0f0',
-                                    marginTop: 8
-                                }}
-                                onClick={() => setSelectedCandidateInModal(-1)}
-                            >
-                                <Radio value={-1} style={{ width: '100%' }}>
-                                    <div style={{ padding: '4px 0', color: '#ff4d4f', fontWeight: 500 }}>
-                                        无匹配 - 该源图片在此目标列没有合适的匹配
-                                    </div>
-                                </Radio>
-                            </List.Item>
+                                    </Radio>
+                                </List.Item>
+                            </List>
+
+                            {/* 候选图片列表 - 可滚动 */}
+                            <div style={{ flex: 1, overflowY: 'auto', marginTop: 12, maxHeight: 'calc(70vh - 80px)' }}>
+                                <List
+                                    dataSource={currentCandidates}
+                                    size="small"
+                                    bordered
+                                    renderItem={(item, index) => (
+                                        <List.Item
+                                            style={{
+                                                padding: '12px',
+                                                cursor: 'pointer',
+                                                backgroundColor: selectedCandidateInModal === item.id ? '#e6f7ff' : 'transparent'
+                                            }}
+                                            onClick={() => setSelectedCandidateInModal(item.id)}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 16 }}>
+                                                <Radio value={item.id} />
+                                                <div style={{
+                                                    width: 140,
+                                                    height: 140,
+                                                    flexShrink: 0,
+                                                    backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
+                                                    backgroundSize: '20px 20px',
+                                                    backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    border: '1px solid #d9d9d9',
+                                                    borderRadius: 4,
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    <Image
+                                                        src={`/api/image?path=${encodeURIComponent(item.path)}`}
+                                                        style={{
+                                                            maxWidth: '100%',
+                                                            maxHeight: '100%',
+                                                            objectFit: 'contain'
+                                                        }}
+                                                        preview={{
+                                                            mask: '预览'
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center'
+                                                    }}>
+                                                        <span style={{
+                                                            fontWeight: 500,
+                                                            fontSize: 14,
+                                                            color: item.similarity >= 80 ? '#52c41a' : item.similarity >= 60 ? '#faad14' : '#ff4d4f'
+                                                        }}>
+                                                            #{index + 1} - 相似度: {item.similarity.toFixed(2)}%
+                                                        </span>
+                                                        <span style={{ fontSize: 13, color: '#8c8c8c' }}>
+                                                            {item.width} × {item.height}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </List.Item>
+                                    )}
+                                />
+                            </div>
                         </Radio.Group>
                     </div>
                 </div>
