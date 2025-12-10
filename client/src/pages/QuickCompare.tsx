@@ -47,6 +47,7 @@ const QuickCompare: React.FC = () => {
     const [currentSourceId, setCurrentSourceId] = useState<number | null>(null);
     const [currentTargetId, setCurrentTargetId] = useState<number | null>(null);
     const [currentTargetName, setCurrentTargetName] = useState<string>('');
+    const [currentSourceImage, setCurrentSourceImage] = useState<{ path: string, width: number, height: number } | null>(null);
     const [selectedCandidateInModal, setSelectedCandidateInModal] = useState<number | null>(null);
 
     // Helper to collect file IDs from tree
@@ -347,11 +348,19 @@ const QuickCompare: React.FC = () => {
     };
 
     // Open candidate selection modal
-    const openCandidateModal = (sourceId: number, targetId: number, targetName: string, candidates: any[], currentSelectedId?: number) => {
+    const openCandidateModal = (
+        sourceId: number,
+        targetId: number,
+        targetName: string,
+        candidates: any[],
+        sourceImage: { path: string, width: number, height: number },
+        currentSelectedId?: number
+    ) => {
         setCurrentSourceId(sourceId);
         setCurrentTargetId(targetId);
         setCurrentTargetName(targetName);
         setCurrentCandidates(candidates);
+        setCurrentSourceImage(sourceImage);
         setSelectedCandidateInModal(currentSelectedId || (candidates.length > 0 ? candidates[0].id : null));
         setModalVisible(true);
     };
@@ -491,7 +500,14 @@ const QuickCompare: React.FC = () => {
                                     <span style={{ color: '#999' }}>无匹配</span>
                                 </div>
                                 {candidates.length > 0 && (
-                                    <a onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, undefined)}>
+                                    <a onClick={() => openCandidateModal(
+                                        record.source_file_id,
+                                        target!.id,
+                                        key,
+                                        candidates,
+                                        { path: record.source.thumb_url, width: record.source.width || 0, height: record.source.height || 0 },
+                                        undefined
+                                    )}>
                                         重新选择
                                     </a>
                                 )}
@@ -587,7 +603,14 @@ const QuickCompare: React.FC = () => {
                                             size="small"
                                             type="link"
                                             style={{ padding: '0 4px', height: 'auto' }}
-                                            onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, targetSelection?.selected_candidate_id)}
+                                            onClick={() => openCandidateModal(
+                                                record.source_file_id,
+                                                target!.id,
+                                                key,
+                                                candidates,
+                                                { path: record.source.thumb_url, width: record.source.width || 0, height: record.source.height || 0 },
+                                                targetSelection?.selected_candidate_id
+                                            )}
                                         >
                                             全部 {candidates.length} 个
                                         </Button>
@@ -755,47 +778,47 @@ const QuickCompare: React.FC = () => {
                 open={modalVisible}
                 onOk={handleModalOk}
                 onCancel={() => setModalVisible(false)}
-                width={900}
+                width={1100}
                 okText="确定"
                 cancelText="取消"
-                bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
             >
-                <Radio.Group
-                    onChange={e => setSelectedCandidateInModal(e.target.value)}
-                    value={selectedCandidateInModal}
-                    style={{ width: '100%' }}
-                >
-                    <List
-                        dataSource={currentCandidates}
-                        size="small"
-                        bordered
-                        renderItem={(item, index) => (
-                            <List.Item
-                                style={{
-                                    padding: '8px 12px',
-                                    cursor: 'pointer',
-                                    backgroundColor: selectedCandidateInModal === item.id ? '#e6f7ff' : 'transparent'
-                                }}
-                                onClick={() => setSelectedCandidateInModal(item.id)}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
-                                    <Radio value={item.id} />
-                                    <div style={{
-                                        width: 80,
-                                        height: 80,
-                                        flexShrink: 0,
-                                        backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
-                                        backgroundSize: '10px 10px',
-                                        backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '1px solid #d9d9d9',
-                                        borderRadius: 4,
-                                        overflow: 'hidden'
-                                    }}>
+                <div style={{ display: 'flex', gap: 16 }}>
+                    {/* 左侧：源图片 - 固定不动 */}
+                    <div style={{ width: 280, flexShrink: 0 }}>
+                        <div style={{
+                            padding: 12,
+                            background: '#fafafa',
+                            borderRadius: 4,
+                            border: '1px solid #d9d9d9'
+                        }}>
+                            <div style={{
+                                fontWeight: 500,
+                                marginBottom: 12,
+                                fontSize: 14,
+                                color: '#262626'
+                            }}>
+                                源图片
+                            </div>
+                            {currentSourceImage && (
+                                <>
+                                    <div
+                                        style={{
+                                            width: '100%',
+                                            height: 200,
+                                            backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
+                                            backgroundSize: '20px 20px',
+                                            backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            border: '1px solid #d9d9d9',
+                                            borderRadius: 4,
+                                            overflow: 'hidden',
+                                            marginBottom: 12
+                                        }}
+                                    >
                                         <Image
-                                            src={`/api/image?path=${encodeURIComponent(item.path)}`}
+                                            src={currentSourceImage.path}
                                             style={{
                                                 maxWidth: '100%',
                                                 maxHeight: '100%',
@@ -806,55 +829,113 @@ const QuickCompare: React.FC = () => {
                                             }}
                                         />
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: 4
-                                        }}>
-                                            <span style={{
-                                                fontWeight: 500,
-                                                fontSize: 13,
-                                                color: item.similarity >= 80 ? '#52c41a' : item.similarity >= 60 ? '#faad14' : '#ff4d4f'
-                                            }}>
-                                                #{index + 1} - 相似度: {item.similarity.toFixed(2)}%
-                                            </span>
-                                            <span style={{ fontSize: 12, color: '#8c8c8c' }}>
-                                                {item.width} × {item.height}
-                                            </span>
-                                        </div>
-                                        <div style={{
-                                            fontSize: 12,
-                                            color: '#595959',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }} title={item.path}>
-                                            {item.path}
-                                        </div>
+                                    <div style={{ textAlign: 'center', fontSize: 12, color: '#8c8c8c' }}>
+                                        尺寸: {currentSourceImage.width} × {currentSourceImage.height}
                                     </div>
-                                </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 右侧：候选列表 - 可滚动 */}
+                    <div style={{ flex: 1, minWidth: 0, maxHeight: '70vh', overflowY: 'auto' }}>
+                        <Radio.Group
+                            onChange={e => setSelectedCandidateInModal(e.target.value)}
+                            value={selectedCandidateInModal}
+                            style={{ width: '100%' }}
+                        >
+                            <List
+                                dataSource={currentCandidates}
+                                size="small"
+                                bordered
+                                renderItem={(item, index) => (
+                                    <List.Item
+                                        style={{
+                                            padding: '8px 12px',
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedCandidateInModal === item.id ? '#e6f7ff' : 'transparent'
+                                        }}
+                                        onClick={() => setSelectedCandidateInModal(item.id)}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 12 }}>
+                                            <Radio value={item.id} />
+                                            <div style={{
+                                                width: 80,
+                                                height: 80,
+                                                flexShrink: 0,
+                                                backgroundImage: 'linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%)',
+                                                backgroundSize: '10px 10px',
+                                                backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                border: '1px solid #d9d9d9',
+                                                borderRadius: 4,
+                                                overflow: 'hidden'
+                                            }}>
+                                                <Image
+                                                    src={`/api/image?path=${encodeURIComponent(item.path)}`}
+                                                    style={{
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        objectFit: 'contain'
+                                                    }}
+                                                    preview={{
+                                                        mask: '预览'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    marginBottom: 4
+                                                }}>
+                                                    <span style={{
+                                                        fontWeight: 500,
+                                                        fontSize: 13,
+                                                        color: item.similarity >= 80 ? '#52c41a' : item.similarity >= 60 ? '#faad14' : '#ff4d4f'
+                                                    }}>
+                                                        #{index + 1} - 相似度: {item.similarity.toFixed(2)}%
+                                                    </span>
+                                                    <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                                                        {item.width} × {item.height}
+                                                    </span>
+                                                </div>
+                                                <div style={{
+                                                    fontSize: 12,
+                                                    color: '#595959',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap'
+                                                }} title={item.path}>
+                                                    {item.path}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </List.Item>
+                                )}
+                            />
+                            <List.Item
+                                style={{
+                                    padding: '12px',
+                                    cursor: 'pointer',
+                                    backgroundColor: selectedCandidateInModal === -1 ? '#fff1f0' : 'transparent',
+                                    borderTop: '2px solid #f0f0f0',
+                                    marginTop: 8
+                                }}
+                                onClick={() => setSelectedCandidateInModal(-1)}
+                            >
+                                <Radio value={-1} style={{ width: '100%' }}>
+                                    <div style={{ padding: '4px 0', color: '#ff4d4f', fontWeight: 500 }}>
+                                        无匹配 - 该源图片在此目标列没有合适的匹配
+                                    </div>
+                                </Radio>
                             </List.Item>
-                        )}
-                    />
-                    <List.Item
-                        style={{
-                            padding: '12px',
-                            cursor: 'pointer',
-                            backgroundColor: selectedCandidateInModal === -1 ? '#fff1f0' : 'transparent',
-                            borderTop: '2px solid #f0f0f0',
-                            marginTop: 8
-                        }}
-                        onClick={() => setSelectedCandidateInModal(-1)}
-                    >
-                        <Radio value={-1} style={{ width: '100%' }}>
-                            <div style={{ padding: '4px 0', color: '#ff4d4f', fontWeight: 500 }}>
-                                无匹配 - 该源图片在此目标列没有合适的匹配
-                            </div>
-                        </Radio>
-                    </List.Item>
-                </Radio.Group>
+                        </Radio.Group>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

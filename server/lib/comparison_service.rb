@@ -70,6 +70,19 @@ class ComparisonService
       puts "\n[COMPARING] All files indexed, starting comparison phase..."
       @project.update(status: 'comparing')
 
+      # 预加载所有需要的数据到内存，避免在多线程中查询数据库
+      puts "[COMPARING] Preloading project targets and target files..."
+      project_targets_data = ProjectTarget.where(project_id: @project.id)
+                                          .includes(:target_files)
+                                          .map do |target|
+        {
+          id: target.id,
+          name: target.name,
+          target_files: target.target_files.to_a
+        }
+      end
+      puts "[COMPARING] Preloaded #{project_targets_data.size} targets"
+
       @worker_pool.start
 
       # 只处理已索引的source文件
@@ -84,7 +97,7 @@ class ComparisonService
 
       source_files.each do |sf|
         @worker_pool.add_job do
-          compare_single_source(sf)
+          compare_single_source(sf, project_targets_data)
         end
       end
 
@@ -121,10 +134,12 @@ class ComparisonService
 
   private
 
-  def compare_single_source(source_file)
-    @project.project_targets.each do |target|
-      # 获取所有target文件（避免 N+1 查询，在外层已经 includes）
-      all_targets = target.target_files.to_a
+  def compare_single_source(source_file, project_targets_data)
+    # 使用预加载的数据，避免在线程中访问 ActiveRecord 关联
+    project_targets_data.each do |target_data|
+      target_id = target_data[:id]
+      target_name = target_data[:name]
+      all_targets = target_data[:target_files]
 
       # 第一步：自适应尺寸筛选
       filtered_targets = DimensionFilter.adaptive_filter_targets(source_file, all_targets)
@@ -162,8 +177,8 @@ class ComparisonService
         filtered = candidates.select { |c| c[:similarity] > threshold }
 
         if filtered.any?
-          # 限制最多20个候选项
-          final_candidates = filtered.first(20)
+          # 限制最多50个候选项
+          final_candidates = filtered.first(50)
           used_threshold = threshold
           break
         end
@@ -180,7 +195,7 @@ class ComparisonService
       final_candidates.each_with_index do |cand, index|
         record = {
           source_file_id: source_file.id,
-          project_target_id: target.id,
+          project_target_id: target_id,
           file_path: cand[:target_file].full_path,
           similarity_score: cand[:similarity],
           rank: index + 1,
@@ -199,7 +214,7 @@ class ComparisonService
         end
       end
 
-      puts "Found #{final_candidates.size} candidates for #{source_file.relative_path} in #{target.name} (threshold: #{used_threshold}%)"
+      puts "Found #{final_candidates.size} candidates for #{source_file.relative_path} in #{target_name} (threshold: #{used_threshold}%)"
 
       # 及时释放 candidates 数组的内存引用
       candidates = nil
