@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { Table, Button, Input, Space, Image, message, Checkbox, InputNumber, Select, Modal, List, Radio, Progress } from 'antd';
 import { useParams } from 'react-router-dom';
 import { getProjectFiles, getCandidates, selectCandidate, markNoMatch, confirmRow, exportProject, getProject, getExportProgress } from '../api';
@@ -19,10 +19,13 @@ const QuickCompare: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [projectTargets, setProjectTargets] = useState<ProjectTarget[]>([]);
     const [projectOutputPath, setProjectOutputPath] = useState<string>('');
+    const [projectName, setProjectName] = useState<string>('');
+    const [projectSourcePath, setProjectSourcePath] = useState<string>('');
 
     // Export Progress State
     const [exportProgress, setExportProgress] = useState<{ total: number, processed: number, current: string } | null>(null);
     const [isExporting, setIsExporting] = useState(false);
+    const exportPathRef = useRef<string>(''); // 使用 ref 存储导出路径，避免闭包问题
 
     // Filters
     const [searchText, setSearchText] = useState('');
@@ -69,6 +72,8 @@ const QuickCompare: React.FC = () => {
         ]).then(([project, root]) => {
             setProjectTargets(project.targets || []);
             setProjectOutputPath(project.output_path || '');
+            setProjectName(project.name || '');
+            setProjectSourcePath(project.source_path || '');
 
             // Check for duplicate warnings
             if (project.duplicate_warnings && project.duplicate_warnings.length > 0) {
@@ -203,7 +208,22 @@ const QuickCompare: React.FC = () => {
     const handleExport = async () => {
         let usePlaceholder = true;
         let onlyConfirmed = false;
-        let exportPath = projectOutputPath; // 使用项目默认输出路径
+
+        // 计算默认导出路径：源图片目录/项目名_exports
+        const getDefaultExportPath = () => {
+            if (!projectSourcePath || !projectName) return projectOutputPath;
+
+            // 获取源路径的父目录
+            const pathParts = projectSourcePath.split('/');
+            pathParts.pop(); // 移除最后一个部分（源图片目录名）
+            const parentDir = pathParts.join('/') || '/';
+
+            // 返回: 父目录/项目名_exports
+            return `${parentDir}/${projectName}_exports`;
+        };
+
+        const defaultExportPath = getDefaultExportPath();
+        let exportPath = defaultExportPath;
 
         Modal.confirm({
             title: '确认导出',
@@ -215,7 +235,7 @@ const QuickCompare: React.FC = () => {
                     <div style={{ marginBottom: 12 }}>
                         <div style={{ marginBottom: 4, fontSize: 13, fontWeight: 500 }}>导出路径：</div>
                         <Input
-                            defaultValue={projectOutputPath}
+                            defaultValue={defaultExportPath}
                             onChange={(e) => { exportPath = e.target.value; }}
                             placeholder="请输入导出路径"
                             style={{ width: '100%' }}
@@ -249,6 +269,7 @@ const QuickCompare: React.FC = () => {
                 try {
                     setIsExporting(true);
                     setExportProgress(null); // 清除之前的进度
+                    exportPathRef.current = exportPath; // 保存到 ref
                     await exportProject(projectId, usePlaceholder, onlyConfirmed, exportPath);
                     message.success('导出已在后台开始');
                     // Update the output path after successful export start
@@ -282,6 +303,9 @@ const QuickCompare: React.FC = () => {
                         setIsExporting(false);
                         setExportProgress(null);
 
+                        // 从 ref 获取导出路径
+                        const displayPath = exportPathRef.current || projectOutputPath || '未知路径';
+
                         // 显示导出完成对话框
                         Modal.success({
                             title: '导出完成',
@@ -291,7 +315,7 @@ const QuickCompare: React.FC = () => {
                                     <p style={{ marginBottom: 12 }}>图片导出已完成！</p>
                                     <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 4, wordBreak: 'break-all' }}>
                                         <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>导出路径：</div>
-                                        <div style={{ fontFamily: 'monospace', fontSize: 13 }}>{projectOutputPath}</div>
+                                        <div style={{ fontFamily: 'monospace', fontSize: 13 }}>{displayPath}</div>
                                     </div>
                                     <p style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
                                         共处理 {progress.total} 个文件

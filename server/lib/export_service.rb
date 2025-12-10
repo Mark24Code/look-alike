@@ -1,10 +1,11 @@
 require 'csv'
 
 class ExportService
-  def initialize(project, use_placeholder: true, only_confirmed: false)
+  def initialize(project, use_placeholder: true, only_confirmed: false, output_path: nil)
     @project = project
     @use_placeholder = use_placeholder
     @only_confirmed = only_confirmed
+    @output_path = output_path
     @no_match_files = []
     @error_logs = []
     @placeholder_path = File.join(File.dirname(__FILE__), '..', 'assets', 'placeholder_no_match.png')
@@ -14,7 +15,7 @@ class ExportService
   def process
     # 导出用户已确认的图片匹配结果
     # 按目标列（语言）组织导出
-    output_root = @project.output_path
+    output_root = @output_path && !@output_path.empty? ? @output_path : @project.output_path
     FileUtils.mkdir_p(output_root)
 
     # 根据 only_confirmed 参数决定导出哪些源文件

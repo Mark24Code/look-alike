@@ -323,9 +323,10 @@ post '/api/projects/:id/export' do
 
   use_placeholder = data['use_placeholder'].nil? ? true : data['use_placeholder']
   only_confirmed = data['only_confirmed'] || false
+  output_path = data['output_path']
 
   ThreadManager.start_export(project.id) do
-    ExportService.new(project, use_placeholder: use_placeholder, only_confirmed: only_confirmed).process
+    ExportService.new(project, use_placeholder: use_placeholder, only_confirmed: only_confirmed, output_path: output_path).process
   end
 
   { status: 'exporting' }.to_json

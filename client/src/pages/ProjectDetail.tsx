@@ -23,6 +23,29 @@ const ProjectDetail: React.FC = () => {
 
     if (!project) return <Spin size="large" style={{ margin: 50 }} />;
 
+    // 状态翻译
+    const getStatusText = (status: string) => {
+        const statusMap: Record<string, string> = {
+            'pending': '待处理',
+            'indexing': '索引中',
+            'indexed': '已索引',
+            'comparing': '比较中',
+            'processing': '处理中',
+            'scanned': '已扫描',
+            'completed': '已完成',
+            'error': '错误'
+        };
+        return statusMap[status] || status;
+    };
+
+    const getStatusColor = (status: string) => {
+        if (status === 'completed') return 'success';
+        if (status === 'error') return 'error';
+        if (status === 'processing' || status === 'comparing' || status === 'indexing') return 'processing';
+        if (status === 'indexed' || status === 'scanned') return 'cyan';
+        return 'default';
+    };
+
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width={250} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
@@ -31,7 +54,7 @@ const ProjectDetail: React.FC = () => {
                     <div style={{ marginBottom: 16 }}>
                         <Text strong>{project.name}</Text>
                         <br />
-                        <Tag color={project.status === 'completed' ? 'success' : 'default'}>{project.status}</Tag>
+                        <Tag color={getStatusColor(project.status)}>{getStatusText(project.status)}</Tag>
                     </div>
                     {project.stats && (
                         <div style={{ fontSize: 12, color: '#888' }}>

@@ -59,10 +59,11 @@ export const confirmRow = async (projectId: number, sourceFileId: number, confir
     });
 };
 
-export const exportProject = async (id: number, usePlaceholder: boolean = true, onlyConfirmed: boolean = false) => {
+export const exportProject = async (id: number, usePlaceholder: boolean = true, onlyConfirmed: boolean = false, outputPath?: string) => {
     await api.post(`/projects/${id}/export`, {
         use_placeholder: usePlaceholder,
-        only_confirmed: onlyConfirmed
+        only_confirmed: onlyConfirmed,
+        output_path: outputPath
     });
 };
 
