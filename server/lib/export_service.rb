@@ -108,9 +108,9 @@ class ExportService
   def save_progress
     # 将进度保存到数据库或缓存中，供前端查询
     # 这里使用简单的文件缓存
-    # 使用实际的导出路径，而不是项目默认路径
-    progress_dir = @resolved_output_path || @project.output_path
-    progress_file = File.join(progress_dir, '.export_progress.json')
+    # 注意：进度文件始终保存在项目默认路径，这样前端可以正确查询
+    # 实际的导出文件则保存到用户指定的路径
+    progress_file = File.join(@project.output_path, '.export_progress.json')
     FileUtils.mkdir_p(File.dirname(progress_file))
     File.write(progress_file, @progress.to_json)
   rescue => e
