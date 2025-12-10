@@ -13,6 +13,12 @@ class IndexingService
   end
 
   def process
+    puts "\n========================================="
+    puts "IndexingService.process started"
+    puts "Project: #{@project.name} (ID: #{@project.id})"
+    puts "Source path: #{@project.source_path}"
+    puts "========================================="
+
     @project.update(status: 'indexing')
 
     begin
@@ -23,19 +29,40 @@ class IndexingService
       index_target_files
 
       @project.update(status: 'indexed')
+      puts "\n[SUCCESS] IndexingService completed"
+      puts "========================================="
     rescue => e
       @project.update(status: 'error', error_message: e.message)
-      puts "IndexingService error: #{e.message}"
-      puts e.backtrace
+      puts "\n[ERROR] IndexingService error: #{e.message}"
+      puts "[ERROR] Backtrace:"
+      puts e.backtrace.join("\n")
+      puts "========================================="
     end
   end
 
   private
 
   def index_source_files
-    images = Dir.glob(File.join(@project.source_path, "**", "*.{jpg,jpeg,png,webp,bmp}"), File::FNM_CASEFOLD)
+    puts "\n[SOURCE] Scanning source directory: #{@project.source_path}"
 
-    puts "Found #{images.size} source images to index"
+    # 检查路径是否存在（去除空格）
+    source_path = @project.source_path.strip
+    unless Dir.exist?(source_path)
+      puts "[ERROR] Source path does not exist: '#{@project.source_path}'"
+      puts "[ERROR] Path after strip: '#{source_path}'"
+      return
+    end
+
+    images = Dir.glob(File.join(source_path, "**", "*.{jpg,jpeg,png,webp,bmp}"), File::FNM_CASEFOLD)
+
+    puts "[SOURCE] Found #{images.size} source images to index"
+
+    if images.empty?
+      puts "[WARNING] No source images found! Check:"
+      puts "  - Path exists: #{Dir.exist?(source_path)}"
+      puts "  - Path readable: #{File.readable?(source_path)}"
+      puts "  - Sample files: #{Dir.glob(File.join(source_path, '*')).first(5).join(', ')}"
+    end
 
     # 批量检查已存在的文件（避免 N+1 查询）
     existing_paths = SourceFile.where(project: @project)
@@ -44,11 +71,11 @@ class IndexingService
 
     # 过滤掉已存在的文件
     new_images = images.reject do |full_path|
-      relative_path = Pathname.new(full_path).relative_path_from(Pathname.new(@project.source_path)).to_s
+      relative_path = Pathname.new(full_path).relative_path_from(Pathname.new(source_path)).to_s
       existing_paths.include?(relative_path)
     end
 
-    puts "#{new_images.size} new source images to process"
+    puts "[SOURCE] #{new_images.size} new source images to process"
 
     # 启动线程池
     @worker_pool.start
@@ -56,7 +83,7 @@ class IndexingService
     # 并行处理图片
     new_images.each do |full_path|
       @worker_pool.add_job do
-        process_single_source(full_path)
+        process_single_source(full_path, source_path)
       end
     end
 
@@ -65,10 +92,13 @@ class IndexingService
 
     # 批量插入剩余数据
     flush_source_batch
+
+    puts "[SOURCE] Source file indexing completed"
   end
 
-  def process_single_source(full_path)
-    relative_path = Pathname.new(full_path).relative_path_from(Pathname.new(@project.source_path)).to_s
+  def process_single_source(full_path, source_path = nil)
+    source_path ||= @project.source_path.strip
+    relative_path = Pathname.new(full_path).relative_path_from(Pathname.new(source_path)).to_s
 
     img = nil
     comparator = nil
@@ -144,10 +174,27 @@ class IndexingService
   end
 
   def index_target_files
+    puts "\n[TARGET] Starting target file indexing..."
+
     @project.project_targets.each do |target|
+      puts "\n[TARGET] Processing target: #{target.name}"
+      puts "[TARGET] Target path: #{target.path}"
+
+      # 检查路径是否存在
+      unless Dir.exist?(target.path)
+        puts "[ERROR] Target path does not exist: #{target.path}"
+        next
+      end
+
       images = Dir.glob(File.join(target.path, "**", "*.{jpg,jpeg,png,webp,bmp}"), File::FNM_CASEFOLD)
 
-      puts "Found #{images.size} target images in #{target.name}"
+      puts "[TARGET] Found #{images.size} target images in #{target.name}"
+
+      if images.empty?
+        puts "[WARNING] No target images found in #{target.name}!"
+        puts "[WARNING] Path: #{target.path}"
+        puts "[WARNING] Sample files: #{Dir.glob(File.join(target.path, '*')).first(5).join(', ')}"
+      end
 
       # 批量检查已存在的文件
       existing_paths = TargetFile.where(project_target: target)
@@ -160,7 +207,7 @@ class IndexingService
         existing_paths.include?(relative_path)
       end
 
-      puts "#{new_images.size} new target images to process"
+      puts "[TARGET] #{new_images.size} new target images to process for #{target.name}"
 
       # 初始化该 target 的批次数组
       @target_batches[target.id] = []
@@ -180,7 +227,11 @@ class IndexingService
 
       # 批量插入剩余数据
       flush_target_batch(target.id)
+
+      puts "[TARGET] Target #{target.name} indexing completed"
     end
+
+    puts "\n[TARGET] All target files indexed"
   end
 
   def process_single_target(target, full_path)
