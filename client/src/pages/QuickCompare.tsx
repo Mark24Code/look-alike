@@ -389,7 +389,7 @@ const QuickCompare: React.FC = () => {
                     const newTargetSelections = { ...item.target_selections };
                     newTargetSelections[currentTargetName] = selectedCandidateInModal === -1
                         ? { no_match: true, selected_candidate_id: undefined }
-                        : { no_match: false, selected_candidate_id: selectedCandidateInModal };
+                        : { no_match: false, selected_candidate_id: selectedCandidateInModal ?? undefined };
                     return { ...item, target_selections: newTargetSelections };
                 }
                 return item;
