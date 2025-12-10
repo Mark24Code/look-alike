@@ -612,7 +612,7 @@ const QuickCompare: React.FC = () => {
                                                 targetSelection?.selected_candidate_id
                                             )}
                                         >
-                                            全部 {candidates.length} 个
+                                            候选 {candidates.length} 个
                                         </Button>
                                     )}
                                     <Button
