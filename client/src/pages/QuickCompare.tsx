@@ -203,12 +203,28 @@ const QuickCompare: React.FC = () => {
     const handleExport = async () => {
         let usePlaceholder = true;
         let onlyConfirmed = false;
+        let exportPath = projectOutputPath; // 使用项目默认输出路径
 
         Modal.confirm({
             title: '确认导出',
+            width: 600,
             content: (
                 <div>
-                    <p>确定要导出图片匹配结果吗？</p>
+                    <p style={{ marginBottom: 16 }}>确定要导出图片匹配结果吗？</p>
+
+                    <div style={{ marginBottom: 12 }}>
+                        <div style={{ marginBottom: 4, fontSize: 13, fontWeight: 500 }}>导出路径：</div>
+                        <Input
+                            defaultValue={projectOutputPath}
+                            onChange={(e) => { exportPath = e.target.value; }}
+                            placeholder="请输入导出路径"
+                            style={{ width: '100%' }}
+                        />
+                        <div style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+                            导出的文件将保存到此目录
+                        </div>
+                    </div>
+
                     <div style={{ marginBottom: 8 }}>
                         <Checkbox
                             defaultChecked={true}
@@ -233,8 +249,12 @@ const QuickCompare: React.FC = () => {
                 try {
                     setIsExporting(true);
                     setExportProgress(null); // 清除之前的进度
-                    await exportProject(projectId, usePlaceholder, onlyConfirmed);
+                    await exportProject(projectId, usePlaceholder, onlyConfirmed, exportPath);
                     message.success('导出已在后台开始');
+                    // Update the output path after successful export start
+                    if (exportPath) {
+                        setProjectOutputPath(exportPath);
+                    }
                     // Start polling for progress
                     pollExportProgress();
                 } catch (e: any) {
@@ -539,9 +559,14 @@ const QuickCompare: React.FC = () => {
                                 <div style={{ color: '#888' }}>{displayCand.width} × {displayCand.height}</div>
                                 <Space direction="horizontal" size={4} style={{ marginTop: 4, justifyContent: 'center' }}>
                                     {candidates.length > 1 && (
-                                        <a onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, targetSelection?.selected_candidate_id)}>
+                                        <Button
+                                            size="small"
+                                            type="link"
+                                            style={{ padding: '0 4px', height: 'auto' }}
+                                            onClick={() => openCandidateModal(record.source_file_id, target!.id, key, candidates, targetSelection?.selected_candidate_id)}
+                                        >
                                             全部 {candidates.length} 个
-                                        </a>
+                                        </Button>
                                     )}
                                     <Button
                                         size="small"
@@ -564,7 +589,7 @@ const QuickCompare: React.FC = () => {
                                             }
                                         }}
                                     >
-                                        无匹配
+                                        标记无匹配
                                     </Button>
                                 </Space>
                             </div>
@@ -667,7 +692,7 @@ const QuickCompare: React.FC = () => {
                     </div>
                 ) : (
                     <Button type="primary" icon={<ExportOutlined />} onClick={handleExport} disabled={isExporting}>
-                        导出已选择
+                        导出
                     </Button>
                 )}
             </div>
