@@ -271,6 +271,7 @@ const QuickCompare: React.FC = () => {
                     setIsExporting(true);
                     setExportProgress(null); // 清除之前的进度
                     exportPathRef.current = exportPath; // 保存到 ref
+                    console.log('Export path saved to ref:', exportPath);
                     await exportProject(projectId, usePlaceholder, onlyConfirmed, exportPath);
                     message.success('导出已在后台开始');
                     // Update the output path after successful export start
@@ -302,10 +303,10 @@ const QuickCompare: React.FC = () => {
                     // 延迟1秒后显示完成对话框
                     setTimeout(() => {
                         setIsExporting(false);
-                        setExportProgress(null);
 
-                        // 从 ref 获取导出路径
+                        // 从 ref 获取导出路径（确保使用用户输入的路径）
                         const displayPath = exportPathRef.current || projectOutputPath || '未知路径';
+                        console.log('Displaying export completion. Path from ref:', exportPathRef.current, 'Display path:', displayPath);
 
                         // 显示导出完成对话框
                         Modal.success({
@@ -325,6 +326,8 @@ const QuickCompare: React.FC = () => {
                             ),
                             okText: '知道了'
                         });
+
+                        setExportProgress(null);
                     }, 1000);
                 }
             } catch (e) {
