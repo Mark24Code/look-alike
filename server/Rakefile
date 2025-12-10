@@ -1,0 +1,5 @@
+require 'sinatra/activerecord/rake'
+require './app'
+
+# Load custom tasks
+Dir.glob('lib/tasks/*.rake').each { |r| load r }
