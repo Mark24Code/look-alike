@@ -34,6 +34,10 @@ const QuickCompare: React.FC = () => {
     // Selection
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+
     // Modal State - for selecting candidates
     const [modalVisible, setModalVisible] = useState(false);
     const [currentCandidates, setCurrentCandidates] = useState<any[]>([]);
@@ -149,6 +153,8 @@ const QuickCompare: React.FC = () => {
         }
 
         setFilteredData(res);
+        // Reset to first page when filters change
+        setCurrentPage(1);
     }, [searchText, minWidth, minHeight, confirmFilter, orientationFilter, tableData]);
 
     // Toggle confirmation status
@@ -625,7 +631,20 @@ const QuickCompare: React.FC = () => {
                     columns={columns}
                     rowKey="source_file_id"
                     loading={loading}
-                    pagination={{ pageSize: 20, showSizeChanger: true }}
+                    pagination={{
+                        current: currentPage,
+                        pageSize: pageSize,
+                        showSizeChanger: true,
+                        pageSizeOptions: ['10', '20', '50', '100'],
+                        onChange: (page, size) => {
+                            setCurrentPage(page);
+                            if (size !== pageSize) {
+                                setPageSize(size);
+                                setCurrentPage(1);
+                            }
+                        },
+                        showTotal: (total) => `共 ${total} 条`
+                    }}
                     scroll={{ y: 'calc(100vh - 200px)' }}
                     rowSelection={{
                         selectedRowKeys,
