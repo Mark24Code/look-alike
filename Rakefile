@@ -34,9 +34,12 @@ desc "显示所有可用的任务"
 task :help do
   puts colorize("\n=== Look-Alike 项目管理工具 ===\n", 35)
   puts "可用任务:"
-  puts "  rake start:all      - 启动前端和后端服务"
-  puts "  rake start:server   - 启动后端服务 (端口 4567)"
-  puts "  rake start:client   - 启动前端开发服务器 (端口 5173)"
+  puts "  rake start:dev      - 启动开发模式 (前端+后端分别运行)"
+  puts "  rake start:prod     - 启动生产模式 (后端提供前端静态文件)"
+  puts "  rake start:server   - 启动后端服务 (端口 4568)"
+  puts "  rake start:client   - 启动前端开发服务器 (端口 5174)"
+  puts ""
+  puts "  rake build:client   - 构建前端生产版本"
   puts ""
   puts "  rake db:setup       - 初始化数据库 (创建+迁移)"
   puts "  rake db:reset       - 重置数据库 (删除+创建+迁移)"
@@ -57,9 +60,9 @@ end
 # ============= 启动任务 =============
 
 namespace :start do
-  desc "同时启动前端和后端服务"
-  task :all do
-    section "启动所有服务"
+  desc "启动开发模式 (前端+后端分别运行)"
+  task :dev do
+    section "启动开发模式"
 
     # 检查依赖
     unless system("which bundle > /dev/null 2>&1")
@@ -78,18 +81,18 @@ namespace :start do
       Rake::Task['db:setup'].invoke
     end
 
-    info "启动后端服务 (端口 4567)..."
-    server_pid = spawn("cd #{SERVER_DIR} && bundle exec rackup -p 4567")
+    info "启动后端服务 (端口 4568)..."
+    server_pid = spawn("cd #{SERVER_DIR} && bundle exec ruby app.rb")
 
     sleep 2
 
-    info "启动前端服务 (端口 5173)..."
+    info "启动前端服务 (端口 5174)..."
     client_pid = spawn("cd #{CLIENT_DIR} && npm run dev")
 
     puts "\n" + colorize("=" * 60, 36)
-    info "所有服务已启动!"
-    puts "  后端: http://localhost:4567"
-    puts "  前端: http://localhost:5173"
+    info "开发模式已启动!"
+    puts "  后端 API: http://localhost:4568/api/health"
+    puts "  前端开发: http://localhost:5174"
     puts colorize("=" * 60, 36)
     puts "\n按 Ctrl+C 停止所有服务\n\n"
 
@@ -106,6 +109,37 @@ namespace :start do
     Process.wait
   end
 
+  desc "启动生产模式 (后端提供前端静态文件)"
+  task :prod do
+    section "启动生产模式"
+
+    # 检查前端构建产物
+    dist_dir = File.join(CLIENT_DIR, 'dist')
+    unless File.exist?(File.join(dist_dir, 'index.html'))
+      warn "前端构建产物不存在，正在构建..."
+      Rake::Task['build:client'].invoke
+    end
+
+    # 检查数据库
+    unless File.exist?(DB_FILE)
+      warn "数据库不存在,正在初始化..."
+      Rake::Task['db:setup'].invoke
+    end
+
+    info "启动后端服务 (生产模式, 端口 4568)..."
+
+    puts "\n" + colorize("=" * 60, 36)
+    info "生产模式已启动!"
+    puts "  访问地址: http://localhost:4568"
+    puts "  健康检查: http://localhost:4568/api/health"
+    puts colorize("=" * 60, 36)
+    puts "\n按 Ctrl+C 停止服务\n\n"
+
+    Dir.chdir(SERVER_DIR) do
+      exec "bundle exec ruby app.rb"
+    end
+  end
+
   desc "启动后端服务"
   task :server do
     section "启动后端服务"
@@ -116,8 +150,8 @@ namespace :start do
     end
 
     Dir.chdir(SERVER_DIR) do
-      info "后端服务正在启动..."
-      exec "bundle exec rackup -p 4567"
+      info "后端服务正在启动 (端口 4568)..."
+      exec "bundle exec ruby app.rb"
     end
   end
 
@@ -125,7 +159,7 @@ namespace :start do
   task :client do
     section "启动前端开发服务器"
     Dir.chdir(CLIENT_DIR) do
-      info "前端服务正在启动..."
+      info "前端服务正在启动 (端口 5174)..."
       exec "npm run dev"
     end
   end
