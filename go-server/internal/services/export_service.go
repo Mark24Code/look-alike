@@ -5,13 +5,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"image/color"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
 	"os"
 	"path/filepath"
 
+	_ "github.com/chai2010/webp"
 	"github.com/bilibili/look-alike/internal/database"
 	"github.com/bilibili/look-alike/internal/models"
 	"github.com/disintegration/imaging"
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
 )
 
 // ExportService handles exporting of selected images

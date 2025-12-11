@@ -1,8 +1,8 @@
-2025/12/11 16:54:18 ========================================
-2025/12/11 16:54:18 Look-Alike Server (Go Version)
-2025/12/11 16:54:18 ========================================
-2025/12/11 16:54:18 Database path: db/look_alike.sqlite3
-2025/12/11 16:54:18 SQLite database initialized with WAL mode
+2025/12/11 17:09:50 ========================================
+2025/12/11 17:09:50 Look-Alike Server (Go Version)
+2025/12/11 17:09:50 ========================================
+2025/12/11 17:09:50 Database path: db/look_alike.sqlite3
+2025/12/11 17:09:50 SQLite database initialized with WAL mode
 [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
@@ -26,225 +26,59 @@
 [GIN-debug] HEAD   /assets/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
 [GIN-debug] GET    /vite.svg                 --> github.com/bilibili/look-alike/internal/api.SetupRouter.(*RouterGroup).StaticFile.func5 (4 handlers)
 [GIN-debug] HEAD   /vite.svg                 --> github.com/bilibili/look-alike/internal/api.SetupRouter.(*RouterGroup).StaticFile.func5 (4 handlers)
-2025/12/11 16:54:18 ========================================
-2025/12/11 16:54:18 Server starting on http://0.0.0.0:4568
-2025/12/11 16:54:18 API endpoint: http://localhost:4568/api/health
-2025/12/11 16:54:18 Frontend: http://localhost:4568
-2025/12/11 16:54:18 ========================================
+2025/12/11 17:09:50 ========================================
+2025/12/11 17:09:50 Server starting on http://0.0.0.0:4568
+2025/12/11 17:09:50 API endpoint: http://localhost:4568/api/health
+2025/12/11 17:09:50 Frontend: http://localhost:4568
+2025/12/11 17:09:50 ========================================
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on 0.0.0.0:4568
 Started comparison task for project 1
-2025/12/11 16:54:27 =========================================
-2025/12/11 16:54:27 ComparisonService.Process started for project 1: test_final
-2025/12/11 16:54:27 Project status: pending
-2025/12/11 16:54:27 =========================================
-[GIN] 2025/12/11 - 16:54:27 | 200 |    1.075166ms |             ::1 | POST     "/api/projects"
-2025/12/11 16:54:27 [INDEXING] Starting indexing phase...
-2025/12/11 16:54:27 ========================================
-2025/12/11 16:54:27 IndexingService.Process started
-2025/12/11 16:54:27 Project: test_final (ID: 1)
-2025/12/11 16:54:27 Source path: /Users/bilibili/Labspace/compare-image/source
-2025/12/11 16:54:27 ========================================
-2025/12/11 16:54:27 [SOURCE] Scanning source directory: /Users/bilibili/Labspace/compare-image/source
-2025/12/11 16:54:27 [SOURCE] Found 40 source images
-2025/12/11 16:54:27 [SOURCE] 40 new source images to process
-2025/12/11 16:54:27 [SOURCE] Inserted final batch of 40 source files
-2025/12/11 16:54:27 [SOURCE] Source file indexing completed
-2025/12/11 16:54:27 [TARGET] Indexing 1 target directories
-2025/12/11 16:54:27 [TARGET] Indexing target: de (/Users/bilibili/Labspace/compare-image/target_de)
-2025/12/11 16:54:27 [TARGET] Found 40 images in target de
-2025/12/11 16:54:27 [TARGET] 40 new images to process for target de
-2025/12/11 16:54:28 [TARGET] Inserted final batch of 40 target files
-2025/12/11 16:54:28 [TARGET] Target file indexing completed
-2025/12/11 16:54:28 [SUCCESS] IndexingService completed
-2025/12/11 16:54:28 ========================================
-2025/12/11 16:54:28 [INDEXING] Indexing phase completed
-2025/12/11 16:54:28 [VALIDATION] Validating indexing results...
-2025/12/11 16:54:28 [VALIDATION] Total source files: 40
-2025/12/11 16:54:28 [VALIDATION] Indexed source files: 40
-2025/12/11 16:54:28 [VALIDATION] Total target files: 40
-2025/12/11 16:54:28 [COMPARING] Starting comparison phase...
-2025/12/11 16:54:28 [COMPARING] Preloaded 1 targets
-2025/12/11 16:54:28 [COMPARING] Processing 40 indexed source files...
-2025/12/11 16:54:28 Source thumb_3.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source chara_itadori.png: 40 targets -> 2 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source bnr.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source btn_close.png: 40 targets -> 2 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for thumb_3.png in de
-2025/12/11 16:54:28 Source bg_menu.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for bnr.png in de
-2025/12/11 16:54:28 Source bg.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 2 candidates for btn_close.png in de
-2025/12/11 16:54:28 Source bg_goal.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 2 candidates for chara_itadori.png in de
-2025/12/11 16:54:28 Source btn_before.png: 40 targets -> 4 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for bg_menu.png in de
-2025/12/11 16:54:28 Source btn_share.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for bg.png in de
-2025/12/11 16:54:28 Source btn_finish.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for btn_share.png in de
-2025/12/11 16:54:28 Found 1 candidates for bg_goal.png in de
-2025/12/11 16:54:28 Source btn_play.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source btn_next.png: 40 targets -> 2 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for btn_finish.png in de
-2025/12/11 16:54:28 Source btn_before_off.png: 40 targets -> 4 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for btn_play.png in de
-2025/12/11 16:54:28 Source logo_game.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 2 candidates for btn_next.png in de
-2025/12/11 16:54:28 Source chara_kugisaki.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 4 candidates for btn_before.png in de
-2025/12/11 16:54:28 Source decide_1.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for logo_game.png in de
-2025/12/11 16:54:28 Source head_result.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for chara_kugisaki.png in de
-2025/12/11 16:54:28 Source icon_finish.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for decide_1.png in de
-2025/12/11 16:54:28 Source icon_perfect.png: 40 targets -> 40 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for head_result.png in de
-2025/12/11 16:54:28 Source install.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for icon_finish.png in de
-2025/12/11 16:54:28 Source kv-apk.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 4 candidates for btn_before_off.png in de
-2025/12/11 16:54:28 Source kv-appstore.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for install.png in de
-2025/12/11 16:54:28 Source kv-google.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for kv-apk.png in de
-2025/12/11 16:54:28 Source kv-pc.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for kv-appstore.png in de
-2025/12/11 16:54:28 Source logo.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for kv-google.png in de
-2025/12/11 16:54:28 Found 1 candidates for kv-pc.png in de
-2025/12/11 16:54:28 Source btn_submit.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source campaign.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for logo.png in de
-2025/12/11 16:54:28 Source text_start.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for text_start.png in de
-2025/12/11 16:54:28 Found 1 candidates for btn_submit.png in de
-2025/12/11 16:54:28 Source rank_1.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for campaign.png in de
-2025/12/11 16:54:28 Source ogp.jpg: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source rank_2.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for rank_1.png in de
-2025/12/11 16:54:28 Source rank_3.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for rank_2.png in de
-2025/12/11 16:54:28 Found 1 candidates for ogp.jpg in de
-2025/12/11 16:54:28 Source chara_fushiguro.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Source results.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for rank_3.png in de
-2025/12/11 16:54:28 Source text_start_main.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for chara_fushiguro.png in de
-2025/12/11 16:54:28 Source text_start_appetizer.png: 40 targets -> 3 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for results.png in de
-2025/12/11 16:54:28 Source text_start_dessert.png: 40 targets -> 2 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for text_start_main.png in de
-2025/12/11 16:54:28 Source thumb_1.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for thumb_1.png in de
-2025/12/11 16:54:28 Source text_start_soup.png: 40 targets -> 1 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 2 candidates for text_start_dessert.png in de
-2025/12/11 16:54:28 Source thumb_2.png: 40 targets -> 2 after adaptive dimension filter for target de
-2025/12/11 16:54:28 Found 1 candidates for text_start_soup.png in de
-2025/12/11 16:54:28 Found 3 candidates for text_start_appetizer.png in de
-2025/12/11 16:54:28 Found 2 candidates for thumb_2.png in de
-2025/12/11 16:54:28 Found 40 candidates for icon_perfect.png in de
-2025/12/11 16:54:28 [COMPARING] Inserted final batch of 92 candidates
-2025/12/11 16:54:28 [COMPARING] Updated final batch of 40 source files
-2025/12/11 16:54:28 Creating auto-selections for best matches...
-2025/12/11 16:54:28 Inserted final 40 auto-selections
-2025/12/11 16:54:28 Auto-selection completed
-2025/12/11 16:54:28 [SUCCESS] Comparison phase completed
-2025/12/11 16:54:28 =========================================
-[GIN] 2025/12/11 - 16:55:05 | 200 |     381.292µs |             ::1 | POST     "/api/projects/1/candidates"
-[GIN] 2025/12/11 - 16:55:13 | 200 |       315.5µs |             ::1 | POST     "/api/projects/1/candidates"
-[GIN] 2025/12/11 - 16:55:24 | 200 |     740.917µs |             ::1 | POST     "/api/projects/1/candidates"
-[GIN] 2025/12/11 - 16:55:30 | 200 |      1.6215ms |             ::1 | GET      "/"
-[GIN] 2025/12/11 - 16:55:35 | 200 |      48.583µs |             ::1 | HEAD     "/api/image?path=/Users/bilibili/Labspace/compare-image/source/bg_goal.png"
-[GIN] 2025/12/11 - 16:55:37 | 304 |     111.709µs |             ::1 | GET      "/projects/3/compare"
-[GIN] 2025/12/11 - 16:55:37 | 304 |      133.75µs |             ::1 | GET      "/assets/index-CgyO7VQV.js"
-[GIN] 2025/12/11 - 16:55:37 | 304 |     130.958µs |             ::1 | GET      "/assets/index-BIhA_1oW.css"
-[GIN] 2025/12/11 - 16:55:37 | 304 |     126.458µs |             ::1 | GET      "/.well-known/appspecific/com.chrome.devtools.json"
-[GIN] 2025/12/11 - 16:55:37 | 304 |     100.417µs |             ::1 | GET      "/vite.svg"
-[GIN] 2025/12/11 - 16:55:37 | 404 |     144.833µs |             ::1 | GET      "/api/projects/3"
-[GIN] 2025/12/11 - 16:55:40 | 200 |     347.917µs |             ::1 | GET      "/api/projects?page=1"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     536.667µs |             ::1 | GET      "/api/projects/1"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     392.875µs |             ::1 | GET      "/api/projects/1"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    2.924875ms |             ::1 | GET      "/api/projects/1/files"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    6.720625ms |             ::1 | POST     "/api/projects/1/candidates"
-[GIN] 2025/12/11 - 16:55:41 | 200 |       324.5µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbg_goal.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     694.375µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbg_menu.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     754.417µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbg.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     277.375µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_before_off.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     678.458µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbnr.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     231.208µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_next.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |         271µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_close.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     183.375µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_before.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |      395.25µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_finish.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     335.042µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_play.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     833.291µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_share.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    1.105375ms |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fbtn_submit.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    1.828541ms |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fcampaign.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    1.301667ms |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fchara_fushiguro.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     352.042µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fchara_itadori.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     541.333µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fchara_kugisaki.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |    1.623042ms |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fdecide_1.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |         543µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Fhead_result.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     549.667µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Ficon_finish.png"
-[GIN] 2025/12/11 - 16:55:41 | 200 |     272.083µs |             ::1 | GET      "/api/image?path=%2FUsers%2Fbilibili%2FLabspace%2Fcompare-image%2Ftarget_de%2Ficon_perfect.png"
-[GIN] 2025/12/11 - 16:56:03 | 200 |     251.584µs |             ::1 | GET      "/api/image?path=/Users/bilibili/Labspace/compare-image/source/bg_goal.png"
-[GIN] 2025/12/11 - 16:56:09 | 200 |     377.083µs |             ::1 | GET      "/api/projects/1"
-[GIN] 2025/12/11 - 16:56:20 | 200 |    2.360833ms |             ::1 | POST     "/api/projects/1/confirm_row"
+2025/12/11 17:10:03 =========================================
+2025/12/11 17:10:03 ComparisonService.Process started for project 1: webp_test
+2025/12/11 17:10:03 Project status: pending
+2025/12/11 17:10:03 =========================================
+[GIN] 2025/12/11 - 17:10:03 | 200 |     782.292µs |             ::1 | POST     "/api/projects"
+2025/12/11 17:10:03 [INDEXING] Starting indexing phase...
+2025/12/11 17:10:03 ========================================
+2025/12/11 17:10:03 IndexingService.Process started
+2025/12/11 17:10:03 Project: webp_test (ID: 1)
+2025/12/11 17:10:03 Source path: /tmp/webp_test/source
+2025/12/11 17:10:03 ========================================
+2025/12/11 17:10:03 [SOURCE] Scanning source directory: /tmp/webp_test/source
+2025/12/11 17:10:03 [SOURCE] Found 1 source images
+2025/12/11 17:10:03 [SOURCE] 1 new source images to process
+2025/12/11 17:10:03 [SOURCE] Inserted final batch of 1 source files
+2025/12/11 17:10:03 [SOURCE] Source file indexing completed
+2025/12/11 17:10:03 [TARGET] Indexing 1 target directories
+2025/12/11 17:10:03 [TARGET] Indexing target: target (/tmp/webp_test/target)
+2025/12/11 17:10:03 [TARGET] Found 1 images in target target
+2025/12/11 17:10:03 [TARGET] 1 new images to process for target target
+2025/12/11 17:10:03 [TARGET] Inserted final batch of 1 target files
+2025/12/11 17:10:03 [TARGET] Target file indexing completed
+2025/12/11 17:10:03 [SUCCESS] IndexingService completed
+2025/12/11 17:10:03 ========================================
+2025/12/11 17:10:03 [INDEXING] Indexing phase completed
+2025/12/11 17:10:03 [VALIDATION] Validating indexing results...
+2025/12/11 17:10:03 [VALIDATION] Total source files: 1
+2025/12/11 17:10:03 [VALIDATION] Indexed source files: 1
+2025/12/11 17:10:03 [VALIDATION] Total target files: 1
+2025/12/11 17:10:03 [COMPARING] Starting comparison phase...
+2025/12/11 17:10:03 [COMPARING] Preloaded 1 targets
+2025/12/11 17:10:03 [COMPARING] Processing 1 indexed source files...
+2025/12/11 17:10:03 Source test.webp: 1 targets -> 1 after adaptive dimension filter for target target
+2025/12/11 17:10:03 Found 1 candidates for test.webp in target
+2025/12/11 17:10:03 [COMPARING] Inserted final batch of 1 candidates
+2025/12/11 17:10:03 [COMPARING] Updated final batch of 1 source files
+2025/12/11 17:10:03 Creating auto-selections for best matches...
+2025/12/11 17:10:03 Inserted final 1 auto-selections
+2025/12/11 17:10:03 Auto-selection completed
+2025/12/11 17:10:03 [SUCCESS] Comparison phase completed
+2025/12/11 17:10:03 =========================================
+[GIN] 2025/12/11 - 17:10:19 | 200 |     243.834µs |             ::1 | GET      "/api/projects/1"
 Started export task for project 1
-2025/12/11 16:56:36 Starting export for project test_final to /Users/bilibili/Desktop/yyy
-[GIN] 2025/12/11 - 16:56:36 | 200 |     390.708µs |             ::1 | POST     "/api/projects/1/export"
-2025/12/11 16:56:36 Exporting 0 source files
-2025/12/11 16:56:36 Export completed
-[GIN] 2025/12/11 - 16:56:37 | 200 |     259.208µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:38 | 200 |     165.416µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:39 | 200 |     193.417µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:40 | 200 |     448.875µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:41 | 200 |     105.708µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:42 | 200 |     255.583µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:43 | 200 |     340.166µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:44 | 200 |     254.584µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:45 | 200 |     313.917µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:46 | 200 |         238µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:47 | 200 |         302µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:48 | 200 |      317.75µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:49 | 200 |     323.208µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:50 | 200 |     240.625µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:51 | 200 |     274.459µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:52 | 200 |     258.208µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:53 | 200 |     243.292µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:54 | 200 |     323.541µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:55 | 200 |         315µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:56 | 200 |     434.667µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:57 | 200 |     384.084µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:58 | 200 |     262.625µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:56:59 | 200 |     175.667µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:00 | 200 |     402.708µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:01 | 200 |     351.208µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:02 | 200 |     180.041µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:03 | 200 |     254.209µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:04 | 200 |      243.25µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:05 | 200 |     336.625µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:06 | 200 |     427.667µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:07 | 200 |     283.042µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:08 | 200 |     312.042µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:09 | 200 |         315µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:10 | 200 |     351.541µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:11 | 200 |     283.584µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:12 | 200 |     235.375µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:13 | 200 |      518.25µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:14 | 200 |     836.667µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:15 | 200 |     167.167µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:16 | 200 |     231.667µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:17 | 200 |     272.791µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:18 | 200 |     236.625µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:19 | 200 |     395.083µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:20 | 200 |      252.75µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:21 | 200 |     304.416µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:22 | 200 |     356.583µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:23 | 200 |     329.666µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:24 | 200 |      353.75µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:25 | 200 |     241.375µs |             ::1 | GET      "/api/projects/1/export_progress"
-[GIN] 2025/12/11 - 16:57:26 | 200 |     328.583µs |             ::1 | GET      "/api/projects/1/export_progress"
+2025/12/11 17:10:32 Starting export for project webp_test to /tmp/webp_output
+[GIN] 2025/12/11 - 17:10:32 | 200 |     166.333µs |             ::1 | POST     "/api/projects/1/export"
+2025/12/11 17:10:32 Exporting 1 source files
+2025/12/11 17:10:32 Export completed

@@ -4,10 +4,16 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 	"math"
 	"os"
 
+	_ "github.com/chai2010/webp"
 	"github.com/disintegration/imaging"
+	_ "golang.org/x/image/bmp"
+	_ "golang.org/x/image/tiff"
 )
 
 const (
