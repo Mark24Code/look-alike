@@ -1,7 +1,6 @@
 package services
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -274,14 +273,8 @@ func processSourceFile(fullPath, basePath string, projectID uint) (*models.Sourc
 		return nil, err
 	}
 
-	// Calculate hashes
+	// Calculate phash only
 	comparator, err := image.NewImageComparator(fullPath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert histogram to JSON
-	histogramJSON, err := json.Marshal(comparator.Histogram)
 	if err != nil {
 		return nil, err
 	}
@@ -301,9 +294,9 @@ func processSourceFile(fullPath, basePath string, projectID uint) (*models.Sourc
 		AspectRatio:  aspectRatio,
 		Area:         area,
 		Phash:        fmt.Sprintf("%d", comparator.Phash),
-		Ahash:        fmt.Sprintf("%d", comparator.Ahash),
-		Dhash:        fmt.Sprintf("%d", comparator.Dhash),
-		Histogram:    string(histogramJSON),
+		Ahash:        "", // Not used
+		Dhash:        "", // Not used
+		Histogram:    "", // Not used
 	}
 
 	return sourceFile, nil
@@ -321,12 +314,8 @@ func processTargetFile(fullPath, basePath string, targetID uint) (*models.Target
 		return nil, err
 	}
 
+	// Calculate phash only
 	comparator, err := image.NewImageComparator(fullPath)
-	if err != nil {
-		return nil, err
-	}
-
-	histogramJSON, err := json.Marshal(comparator.Histogram)
 	if err != nil {
 		return nil, err
 	}
@@ -344,9 +333,9 @@ func processTargetFile(fullPath, basePath string, targetID uint) (*models.Target
 		AspectRatio:     aspectRatio,
 		Area:            area,
 		Phash:           fmt.Sprintf("%d", comparator.Phash),
-		Ahash:           fmt.Sprintf("%d", comparator.Ahash),
-		Dhash:           fmt.Sprintf("%d", comparator.Dhash),
-		Histogram:       string(histogramJSON),
+		Ahash:           "", // Not used
+		Dhash:           "", // Not used
+		Histogram:       "", // Not used
 	}
 
 	return targetFile, nil

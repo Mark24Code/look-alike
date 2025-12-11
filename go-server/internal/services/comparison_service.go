@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -312,33 +311,16 @@ func (svc *ComparisonService) applyAdaptiveThreshold(candidates []candidateScore
 	return result
 }
 
-// calculateSimilarityFromHashes calculates similarity using pre-computed hashes
+// calculateSimilarityFromHashes calculates similarity using pre-computed phash only
 func calculateSimilarityFromHashes(source *models.SourceFile, target *models.TargetFile) float64 {
-	// Parse hashes from strings
+	// Parse phash from strings
 	sourcePhash, _ := strconv.ParseUint(source.Phash, 10, 64)
 	targetPhash, _ := strconv.ParseUint(target.Phash, 10, 64)
-	sourceAhash, _ := strconv.ParseUint(source.Ahash, 10, 64)
-	targetAhash, _ := strconv.ParseUint(target.Ahash, 10, 64)
-	sourceDhash, _ := strconv.ParseUint(source.Dhash, 10, 64)
-	targetDhash, _ := strconv.ParseUint(target.Dhash, 10, 64)
 
-	// Calculate hash similarities
+	// Calculate phash similarity
 	phashSim := image.HashSimilarity(sourcePhash, targetPhash, 64)
-	ahashSim := image.HashSimilarity(sourceAhash, targetAhash, 1024)
-	dhashSim := image.HashSimilarity(sourceDhash, targetDhash, 64)
 
-	// Parse histograms
-	var sourceHist, targetHist []float64
-	json.Unmarshal([]byte(source.Histogram), &sourceHist)
-	json.Unmarshal([]byte(target.Histogram), &targetHist)
-	histogramSim := image.HistogramSimilarity(sourceHist, targetHist)
-
-	// Weighted average
-	weights := image.Weights
-	return phashSim*weights["phash"] +
-		ahashSim*weights["ahash"] +
-		dhashSim*weights["dhash"] +
-		histogramSim*weights["histogram"]
+	return phashSim
 }
 
 // createAutoSelections creates default selections for rank 1 candidates
