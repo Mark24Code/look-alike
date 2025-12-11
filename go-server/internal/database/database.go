@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/bilibili/look-alike/internal/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -39,8 +40,26 @@ func Initialize(dbPath string) error {
 	sqlDB.SetMaxOpenConns(10)
 	sqlDB.SetMaxIdleConns(5)
 
+	// Auto-migrate database schema
+	if err := autoMigrate(); err != nil {
+		return fmt.Errorf("failed to migrate database: %w", err)
+	}
+
 	log.Println("SQLite database initialized with WAL mode")
 	return nil
+}
+
+// autoMigrate creates or updates database tables
+func autoMigrate() error {
+	return DB.AutoMigrate(
+		&models.Project{},
+		&models.ProjectTarget{},
+		&models.SourceFile{},
+		&models.TargetFile{},
+		&models.ComparisonCandidate{},
+		&models.TargetSelection{},
+		&models.SourceConfirmation{},
+	)
 }
 
 // Close closes the database connection

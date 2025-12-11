@@ -30,55 +30,50 @@ look-alike/
 - **图片处理**: imaging (纯Go实现)
 - **并发**: Goroutines + Channels
 
-## 快速启动
+## 🚀 快速启动
 
-### 方式一：使用 Makefile（推荐）
+### 最简方式（推荐）
 
+**一键启动（自动构建+运行）：**
 ```bash
-# 查看所有可用命令
-make help
-
-# 安装所有依赖
-make install
-
-# 开发模式（前端+后端同时启动）
-make start-dev
-
-# 生产模式（编译后端并启动）
 make start-prod
 ```
 
-### 方式二：手动启动
+启动后访问：**http://localhost:4568**
 
-#### 1. 安装依赖
+### 手动方式
 
-**Go 后端依赖：**
+**1. 构建前端：**
 ```bash
-cd go-server
-GOPROXY=https://goproxy.cn,direct go mod download
+cd client && npm install && npm run build && cd ..
 ```
 
-**前端依赖：**
+**2. 编译服务器：**
 ```bash
-cd client
-npm install
+make build
 ```
 
-#### 2. 启动开发服务器
-
-**后端（端口 4568）：**
+**3. 启动：**
 ```bash
-cd go-server
-go run ./cmd/server
+./look-alike-server
 ```
 
-**前端（端口 5174）：**
-```bash
-cd client
-npm run dev
-```
+就这么简单！
 
-然后在浏览器中访问：http://localhost:5174
+> 💡 **提示**：Go 服务器会自动提供前端静态文件，无需单独运行前端开发服务器。
+
+### 开发模式（可选）
+
+如果需要修改代码并热重载：
+
+```bash
+# 终端1：运行 Go 服务器
+make dev
+
+# 终端2：（可选）运行前端开发服务器
+cd client && npm run dev
+# 前端开发访问 http://localhost:5174
+```
 
 ## 生产环境部署
 

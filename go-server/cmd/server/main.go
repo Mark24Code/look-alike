@@ -15,14 +15,21 @@ func main() {
 	log.Println("Look-Alike Server (Go Version)")
 	log.Println("========================================")
 
-	// Get current working directory
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
+	// Get executable directory or current working directory
+	exePath, err := os.Executable()
+	var baseDir string
+	if err == nil {
+		baseDir = filepath.Dir(exePath)
+	} else {
+		baseDir, _ = os.Getwd()
 	}
 
-	// Database path
-	dbPath := filepath.Join(cwd, "../db/look_alike.sqlite3")
+	// Database path - check multiple locations
+	dbPath := filepath.Join(baseDir, "db/look_alike.sqlite3")
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		// Try relative to working directory
+		dbPath = "db/look_alike.sqlite3"
+	}
 	log.Printf("Database path: %s", dbPath)
 
 	// Initialize database
@@ -32,10 +39,14 @@ func main() {
 	defer database.Close()
 
 	// Client dist path (for production mode)
-	clientDistPath := filepath.Join(cwd, "../client/dist")
+	clientDistPath := filepath.Join(baseDir, "client/dist")
 	if _, err := os.Stat(filepath.Join(clientDistPath, "index.html")); os.IsNotExist(err) {
-		log.Println("Warning: Frontend dist not found, running in API-only mode")
-		clientDistPath = ""
+		// Try relative to working directory
+		clientDistPath = "client/dist"
+		if _, err := os.Stat(filepath.Join(clientDistPath, "index.html")); os.IsNotExist(err) {
+			log.Println("Warning: Frontend dist not found, running in API-only mode")
+			clientDistPath = ""
+		}
 	}
 
 	// Setup router

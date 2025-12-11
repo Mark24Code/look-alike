@@ -200,7 +200,8 @@ func (ic *ImageComparator) calculateHistogram() error {
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			grayColor := grayImg.At(x, y).(color.Gray)
+			c := grayImg.At(x, y)
+			grayColor := color.GrayModel.Convert(c).(color.Gray)
 			histogram[grayColor.Y]++
 			totalPixels++
 		}
@@ -233,8 +234,10 @@ func resizeAndGrayscale(imagePath string, width, height int) ([][]float64, error
 	for y := 0; y < height; y++ {
 		grayscale[y] = make([]float64, width)
 		for x := 0; x < width; x++ {
-			grayColor := grayImg.At(bounds.Min.X+x, bounds.Min.Y+y).(color.Gray)
-			grayscale[y][x] = float64(grayColor.Y)
+			// Convert color to grayscale value (0-255)
+			c := grayImg.At(bounds.Min.X+x, bounds.Min.Y+y)
+			gray := color.GrayModel.Convert(c).(color.Gray)
+			grayscale[y][x] = float64(gray.Y)
 		}
 	}
 

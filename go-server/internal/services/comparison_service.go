@@ -223,7 +223,7 @@ func (svc *ComparisonService) compareSingleSource(sourceFile *models.SourceFile,
 		candidates := svc.calculateSimilarities(sourceFile, filtered, target.ID)
 
 		// Apply adaptive threshold
-		finalCandidates := svc.applyAdaptiveThreshold(candidates, sourceFile.RelativePath, target.Name)
+		finalCandidates := svc.applyAdaptiveThreshold(candidates, sourceFile.ID, sourceFile.RelativePath, target.Name)
 
 		allCandidates = append(allCandidates, finalCandidates...)
 	}
@@ -252,7 +252,7 @@ type candidateScore struct {
 }
 
 // applyAdaptiveThreshold applies adaptive thresholding
-func (svc *ComparisonService) applyAdaptiveThreshold(candidates []candidateScore, sourcePath, targetName string) []models.ComparisonCandidate {
+func (svc *ComparisonService) applyAdaptiveThreshold(candidates []candidateScore, sourceFileID uint, sourcePath, targetName string) []models.ComparisonCandidate {
 	if len(candidates) == 0 {
 		return nil
 	}
@@ -298,7 +298,7 @@ func (svc *ComparisonService) applyAdaptiveThreshold(candidates []candidateScore
 	var result []models.ComparisonCandidate
 	for i, c := range finalCandidates {
 		result = append(result, models.ComparisonCandidate{
-			SourceFileID:    c.targetFile.ProjectTargetID, // This should be sourceFile.ID - fix below
+			SourceFileID:    sourceFileID,
 			ProjectTargetID: c.targetFile.ProjectTargetID,
 			FilePath:        c.targetFile.FullPath,
 			SimilarityScore: c.similarity,
