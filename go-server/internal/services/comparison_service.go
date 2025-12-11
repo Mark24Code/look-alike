@@ -212,14 +212,12 @@ func (svc *ComparisonService) compareSingleSource(sourceFile *models.SourceFile,
 	var allCandidates []models.ComparisonCandidate
 
 	for _, target := range targets {
-		// Filter by dimensions
-		filtered := AdaptiveFilterTargets(sourceFile, target.TargetFiles)
+		// Compare with all target files (no dimension filtering)
+		log.Printf("Source %s: comparing with %d targets for target %s",
+			sourceFile.RelativePath, len(target.TargetFiles), target.Name)
 
-		log.Printf("Source %s: %d targets -> %d after adaptive dimension filter for target %s",
-			sourceFile.RelativePath, len(target.TargetFiles), len(filtered), target.Name)
-
-		// Calculate similarities
-		candidates := svc.calculateSimilarities(sourceFile, filtered, target.ID)
+		// Calculate similarities with all targets
+		candidates := svc.calculateSimilarities(sourceFile, target.TargetFiles, target.ID)
 
 		// Apply adaptive threshold
 		finalCandidates := svc.applyAdaptiveThreshold(candidates, sourceFile.ID, sourceFile.RelativePath, target.Name)
