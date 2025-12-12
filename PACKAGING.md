@@ -98,7 +98,7 @@ make install
 ```
 look-alike-macos-arm64/
 ├── look-alike              # 可执行文件
-├── client/                 # 前端静态资源
+├── dist/                   # 前端静态资源
 │   ├── index.html
 │   ├── assets/
 │   └── vite.svg

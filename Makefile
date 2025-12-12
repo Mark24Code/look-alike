@@ -42,7 +42,7 @@ install-client: ## Install only client dependencies
 build-client: ## Build client for production
 	@echo "$(GREEN)Building client...$(NC)"
 	cd client && npm run build
-	@echo "$(GREEN)Client build complete: client/dist/$(NC)"
+	@echo "$(GREEN)Client build complete: dist/$(NC)"
 
 start-dev: ## Start both server and client in dev mode
 	@echo "$(GREEN)Starting development mode...$(NC)"
@@ -66,7 +66,8 @@ clean: ## Clean build artifacts
 	@echo "$(YELLOW)Cleaning...$(NC)"
 	rm -f look-alike-server
 	rm -rf go-server/tmp
-	rm -rf client/dist
+	rm -rf dist
+	rm -rf dist-packages
 	@echo "$(GREEN)Clean complete$(NC)"
 
 test: ## Run tests

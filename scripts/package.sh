@@ -15,7 +15,8 @@ NC='\033[0m' # No Color
 # Configuration
 APP_NAME="look-alike"
 VERSION="1.0.0"
-DIST_DIR="dist"
+DIST_DIR="dist-packages"  # 打包产物目录（避免与前端 dist 冲突）
+FRONTEND_DIST="dist"      # 前端构建产物目录
 CLIENT_DIR="client"
 SERVER_DIR="go-server"
 
@@ -58,13 +59,15 @@ build_frontend() {
     print_msg "$GREEN" "Building frontend..."
     npm run build
 
-    if [ ! -d "dist" ]; then
-        print_msg "$RED" "Frontend build failed: dist directory not found"
+    cd ..
+
+    # Check if dist exists in project root
+    if [ ! -d "$FRONTEND_DIST" ] || [ ! -f "$FRONTEND_DIST/index.html" ]; then
+        print_msg "$RED" "Frontend build failed: $FRONTEND_DIST directory not found or index.html missing"
         exit 1
     fi
 
-    cd ..
-    print_msg "$GREEN" "✓ Frontend build complete"
+    print_msg "$GREEN" "✓ Frontend build complete (output: $FRONTEND_DIST/)"
 }
 
 # Check if mingw-w64 is available for Windows cross-compilation
@@ -146,8 +149,8 @@ create_package() {
     # Copy binary
     cp "$binary_name" "$build_dir/"
 
-    # Copy frontend dist
-    cp -r "${CLIENT_DIR}/dist" "$build_dir/client/"
+    # Copy frontend dist (from project root)
+    cp -r "$FRONTEND_DIST" "$build_dir/dist"
 
     # Create db directory (will be auto-created by app but good to have)
     mkdir -p "$build_dir/db"

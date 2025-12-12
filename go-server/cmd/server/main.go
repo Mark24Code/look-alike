@@ -46,14 +46,24 @@ func main() {
 	defer database.Close()
 
 	// Client dist path (for production mode)
-	clientDistPath := filepath.Join(baseDir, "client/dist")
-	if _, err := os.Stat(filepath.Join(clientDistPath, "index.html")); os.IsNotExist(err) {
-		// Try relative to working directory
-		clientDistPath = "client/dist"
-		if _, err := os.Stat(filepath.Join(clientDistPath, "index.html")); os.IsNotExist(err) {
-			log.Println("Warning: Frontend dist not found, running in API-only mode")
-			clientDistPath = ""
+	// Try multiple locations: executable dir, working dir
+	var clientDistPath string
+	possiblePaths := []string{
+		filepath.Join(baseDir, "dist"),         // Same directory as executable
+		"dist",                                   // Relative to working directory
+		filepath.Join(baseDir, "client/dist"),   // Legacy location (for backward compatibility)
+		"client/dist",                            // Legacy location (relative)
+	}
+
+	for _, path := range possiblePaths {
+		if _, err := os.Stat(filepath.Join(path, "index.html")); err == nil {
+			clientDistPath = path
+			break
 		}
+	}
+
+	if clientDistPath == "" {
+		log.Println("Warning: Frontend dist not found, running in API-only mode")
 	}
 
 	// Setup router

@@ -11,8 +11,9 @@ node_modules/
 look-alike-server
 look-alike.exe
 look-alike
-dist/
-client/dist/
+dist/                    # 前端构建产物
+dist-packages/           # 打包产物目录
+client/dist/             # 旧的前端构建位置（保留以兼容）
 
 # Go
 go-server/tmp/
@@ -33,3 +34,7 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.zip
+
+dist
+*.tar.gz
