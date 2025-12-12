@@ -110,14 +110,18 @@ make start-prod
 
 ### 1. 图片相似度算法
 
-采用4种哈希算法组合，加权计算相似度：
+采用 **感知哈希 (pHash) + RGB 颜色直方图** 混合算法：
 
 | 算法 | 权重 | 特点 |
 |------|------|------|
-| pHash (感知哈希) | 40% | 基于DCT变换，对缩放压缩不敏感 |
-| aHash (平均哈希) | 20% | 基于平均灰度，简单快速 |
-| dHash (差分哈希) | 20% | 基于像素差异，对水平变化敏感 |
-| 直方图比较 | 20% | 使用巴氏系数，对颜色分布敏感 |
+| pHash (感知哈希) | 70% | 基于 DCT 变换，识别图片结构特征 |
+| RGB 颜色直方图 | 30% | 基于巴氏系数，识别颜色分布差异 |
+
+**算法优势**：
+- 🎯 **结构识别**：pHash 对缩放、压缩、轻微变换不敏感
+- 🎨 **颜色区分**：能区分白色 vs 粉色等颜色差异
+- ⚡ **高性能**：使用 `github.com/corona10/goimagehash` 优化库
+- 🔄 **可调节**：可以调整权重平衡结构和颜色的重要性
 
 ### 2. 高性能并发处理
 
@@ -162,19 +166,63 @@ GET    /api/projects/:id/export_progress    # 导出进度
 ## Makefile 命令
 
 ```bash
-make help          # 显示所有可用命令
-make build         # 编译服务器
-make run           # 编译并运行
-make dev           # 开发模式运行（无需编译）
-make install       # 安装所有依赖
-make build-client  # 构建前端
-make start-dev     # 开发模式（前端+后端）
-make start-prod    # 生产模式
-make clean         # 清理构建文件
-make test          # 运行测试
-make fmt           # 格式化代码
-make lint          # 代码检查
+make help            # 显示所有可用命令
+make build           # 编译服务器
+make run             # 编译并运行
+make dev             # 开发模式运行（无需编译）
+make install         # 安装所有依赖
+make build-client    # 构建前端
+make start-dev       # 开发模式（前端+后端）
+make start-prod      # 生产模式
+make clean           # 清理构建文件
+make test            # 运行测试
+make fmt             # 格式化代码
+make lint            # 代码检查
+make package         # 打包所有平台
+make package-windows # 打包 Windows x64
+make package-mac-amd64  # 打包 macOS Intel
+make package-mac-arm64  # 打包 macOS Apple Silicon
 ```
+
+## 📦 多平台打包
+
+支持一键打包为可直接运行的独立程序，无需安装任何依赖：
+
+### 打包所有平台
+
+```bash
+make package
+```
+
+生成产物：
+- `dist/look-alike-windows-x64.zip` - Windows x64
+- `dist/look-alike-macos-x64.tar.gz` - macOS Intel (x64)
+- `dist/look-alike-macos-arm64.tar.gz` - macOS Apple Silicon (ARM64)
+
+### 打包单个平台
+
+```bash
+make package-windows      # 仅打包 Windows
+make package-mac-amd64    # 仅打包 Mac Intel
+make package-mac-arm64    # 仅打包 Mac ARM
+```
+
+**注意**：Windows 交叉编译需要 `mingw-w64`，详见 [WINDOWS_BUILD.md](WINDOWS_BUILD.md)
+
+### 分发包特性
+
+每个打包产物都包含：
+- ✅ 编译好的可执行文件（无需安装任何运行时）
+- ✅ 前端静态资源（已预编译）
+- ✅ 数据库目录（首次启动自动初始化）
+- ✅ 使用说明（README.txt）
+
+用户只需：
+1. 解压文件
+2. 双击运行（或命令行运行）
+3. 浏览器访问 `http://localhost:4568`
+
+**详细打包文档**：查看 [PACKAGING.md](PACKAGING.md)
 
 ## 性能优势
 

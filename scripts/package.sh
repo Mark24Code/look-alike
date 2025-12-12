@@ -67,6 +67,14 @@ build_frontend() {
     print_msg "$GREEN" "✓ Frontend build complete"
 }
 
+# Check if mingw-w64 is available for Windows cross-compilation
+check_mingw() {
+    if command -v x86_64-w64-mingw32-gcc >/dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
 # Build backend for specific platform
 build_backend() {
     local goos=$1
@@ -75,6 +83,22 @@ build_backend() {
     local platform_name=$4
 
     print_msg "$GREEN" "Building backend for ${platform_name}..."
+
+    # Check for Windows cross-compilation requirements on macOS/Linux
+    if [ "$goos" = "windows" ] && [ "$(uname)" != "Windows" ]; then
+        if ! check_mingw; then
+            print_msg "$YELLOW" "⚠ mingw-w64 not found, cannot cross-compile for Windows"
+            print_msg "$YELLOW" "To build Windows version, install mingw-w64:"
+            print_msg "$YELLOW" "  brew install mingw-w64"
+            print_msg "$YELLOW" ""
+            print_msg "$YELLOW" "Skipping Windows build..."
+            cd "$SERVER_DIR" 2>/dev/null || true
+            cd .. 2>/dev/null || true
+            return 1
+        fi
+        # Set CC for Windows cross-compilation
+        export CC=x86_64-w64-mingw32-gcc
+    fi
 
     cd "$SERVER_DIR"
 
@@ -87,6 +111,9 @@ build_backend() {
         cd ..
         return 1
     fi
+
+    # Unset CC after build
+    unset CC
 
     cd ..
     print_msg "$GREEN" "✓ Backend build complete for ${platform_name}"

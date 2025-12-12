@@ -46,6 +46,28 @@ make package-mac-arm64
 1. **Go 环境** (1.21+)
 2. **Node.js** (18+)
 3. **Make**
+4. **mingw-w64** (可选，仅 Windows 交叉编译需要)
+
+### Windows 交叉编译
+
+如果你在 macOS 或 Linux 上打包 Windows 版本，需要安装 mingw-w64：
+
+**macOS**:
+```bash
+brew install mingw-w64
+```
+
+**Linux (Ubuntu/Debian)**:
+```bash
+sudo apt-get install mingw-w64
+```
+
+**Linux (Fedora/RHEL)**:
+```bash
+sudo dnf install mingw64-gcc
+```
+
+如果没有安装 mingw-w64，打包脚本会自动跳过 Windows 构建并给出提示。
 
 ### 依赖安装
 
@@ -167,11 +189,49 @@ rm db/look_alike.sqlite3*
 
 ### 跨平台编译问题
 
-如果 Windows 打包失败，可能需要安装交叉编译工具。在 macOS 上：
+#### Windows 交叉编译失败
+
+**症状**：在 macOS/Linux 上打包时提示 "mingw-w64 not found"
+
+**解决方案**：
+
+1. **安装 mingw-w64**（推荐）：
+   ```bash
+   # macOS
+   brew install mingw-w64
+
+   # Ubuntu/Debian
+   sudo apt-get install mingw-w64
+
+   # Fedora/RHEL
+   sudo dnf install mingw64-gcc
+   ```
+
+2. **仅打包 macOS 版本**：
+   ```bash
+   make package-mac-amd64
+   make package-mac-arm64
+   ```
+
+3. **在 Windows 机器上构建**：
+   - 如果有 Windows 机器，可以在 Windows 上运行 `make package-windows`
+   - 或在 CI/CD 中使用 Windows runner
+
+#### CGO 编译错误
+
+**症状**：提示 `gcc` 或 `cc` 命令未找到
+
+**解决方案**：
 
 ```bash
-# 安装 mingw-w64（用于 Windows 交叉编译）
-brew install mingw-w64
+# macOS
+xcode-select --install
+
+# Ubuntu/Debian
+sudo apt-get install build-essential
+
+# Fedora/RHEL
+sudo dnf groupinstall "Development Tools"
 ```
 
 ### 前端构建失败

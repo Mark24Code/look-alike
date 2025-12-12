@@ -1,4 +1,4 @@
-.PHONY: build run dev clean install test help
+.PHONY: build run dev clean install test help package package-windows package-mac-amd64 package-mac-arm64
 
 # Colors for output
 GREEN  := \033[0;32m
@@ -8,7 +8,7 @@ NC     := \033[0m # No Color
 help: ## Show this help message
 	@echo "$(GREEN)Look-Alike Golang Server - Available Commands:$(NC)"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
 	@echo ""
 
 build: ## Build the server executable
