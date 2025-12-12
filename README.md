@@ -2,6 +2,9 @@
 
 一个高性能的图片相似度比对工具，用于查找和匹配相似的图片。
 
+[![Release](https://github.com/你的用户名/look-alike/workflows/Release/badge.svg)](https://github.com/你的用户名/look-alike/actions)
+[![CI](https://github.com/你的用户名/look-alike/workflows/CI/badge.svg)](https://github.com/你的用户名/look-alike/actions)
+
 ## 项目结构
 
 ```
@@ -122,6 +125,8 @@ make start-prod
 - 🎨 **颜色区分**：能区分白色 vs 粉色等颜色差异
 - ⚡ **高性能**：使用 `github.com/corona10/goimagehash` 优化库
 - 🔄 **可调节**：可以调整权重平衡结构和颜色的重要性
+
+**详细文档**：查看 [pHash + 颜色直方图算法说明](PHASH_COLOR_ALGORITHM.md)
 
 ### 2. 高性能并发处理
 
@@ -321,6 +326,18 @@ A: 支持 JPEG, PNG, GIF, TIFF, BMP, WebP。
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+## 发布
+
+本项目使用 GitHub Actions 自动构建和发布。
+
+发布新版本：
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+详细说明请查看 [发布指南](.github/RELEASE.md)
 
 ## 许可证
 

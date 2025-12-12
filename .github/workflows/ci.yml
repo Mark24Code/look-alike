@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: cd client && npm ci
+
+      - name: Build frontend
+        run: cd client && npm run build
+
+      - name: Check build output
+        run: |
+          if [ ! -f "dist/index.html" ]; then
+            echo "Error: Frontend build failed - dist/index.html not found"
+            exit 1
+          fi
+          echo "✓ Frontend build successful"
+
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: go-server/go.sum
+
+      - name: Install dependencies
+        run: cd go-server && go mod download
+
+      - name: Run tests
+        run: cd go-server && go test -v ./...
+
+      - name: Build backend
+        run: cd go-server && go build -v ./cmd/server
+
+      - name: Check build output
+        run: |
+          if [ ! -f "go-server/server" ]; then
+            echo "Error: Backend build failed"
+            exit 1
+          fi
+          echo "✓ Backend build successful"
+
+  lint-go:
+    name: Lint Go Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: go-server/go.sum
+
+      - name: Run go fmt
+        run: |
+          cd go-server
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Go code is not formatted:"
+            gofmt -l .
+            exit 1
+          fi
+
+      - name: Run go vet
+        run: cd go-server && go vet ./...
+
+  build-cross-platform:
+    name: Test Cross-Platform Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: macos
+          - os: windows-latest
+            platform: windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: go-server/go.sum
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd client && npm ci
+          cd ../go-server && go mod download
+
+      - name: Build frontend
+        run: cd client && npm run build
+
+      - name: Build backend
+        run: cd go-server && go build -v ./cmd/server
+
+      - name: Verify builds
+        shell: bash
+        run: |
+          echo "✓ Frontend built successfully (dist/)"
+          echo "✓ Backend built successfully (go-server/)"
+          ls -lh dist/ | head -5

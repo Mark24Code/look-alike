@@ -125,9 +125,9 @@ func (ic *ImageComparator) calculateColorHistogram() error {
 		}
 	}
 
-	// Normalize (divide by totalPixels * 3 because we count R, G, B separately)
+	// Normalize (each channel independently)
 	for i := 0; i < 48; i++ {
-		ic.ColorHistogram[i] = float64(histogram[i]) / float64(totalPixels*3)
+		ic.ColorHistogram[i] = float64(histogram[i]) / float64(totalPixels)
 	}
 
 	return nil
