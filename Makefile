@@ -85,4 +85,21 @@ tidy: ## Tidy Go modules
 	@echo "$(GREEN)Tidying Go modules...$(NC)"
 	cd go-server && go mod tidy
 
+package: ## Package for all platforms (Windows x64, Mac x64, Mac ARM64)
+	@echo "$(GREEN)Starting multi-platform packaging...$(NC)"
+	@echo ""
+	@./scripts/package.sh
+
+package-windows: ## Package for Windows x64 only
+	@echo "$(GREEN)Packaging for Windows x64...$(NC)"
+	@./scripts/package.sh windows
+
+package-mac-amd64: ## Package for Mac x64 only
+	@echo "$(GREEN)Packaging for Mac x64...$(NC)"
+	@./scripts/package.sh darwin-amd64
+
+package-mac-arm64: ## Package for Mac ARM64 only
+	@echo "$(GREEN)Packaging for Mac ARM64...$(NC)"
+	@./scripts/package.sh darwin-arm64
+
 .DEFAULT_GOAL := help

@@ -6,6 +6,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
+	"math"
 	"os"
 
 	_ "github.com/chai2010/webp"
@@ -20,20 +21,21 @@ const (
 	HistogramBins = 256 // Histogram bins
 )
 
-// Weights for different algorithms
+// Weights for different features
 var Weights = map[string]float64{
-	"phash": 1.0, // Only use perceptual hash
+	"phash": 0.70, // Structure similarity
+	"color": 0.30, // Color similarity
 }
 
 // ImageComparator holds the computed hashes and histogram for an image
 type ImageComparator struct {
-	ImagePath string
-	Phash     uint64
-	Ahash     uint64
-	Dhash     uint64
-	Histogram []float64
-	Width     int
-	Height    int
+	ImagePath      string
+	Phash          uint64
+	Ahash          uint64
+	Dhash          uint64
+	ColorHistogram [48]float64 // RGB color histogram: R(16) + G(16) + B(16)
+	Width          int
+	Height         int
 }
 
 // NewImageComparator creates a new ImageComparator for the given image path
@@ -54,8 +56,11 @@ func NewImageComparator(imagePath string) (*ImageComparator, error) {
 		Height:    height,
 	}
 
-	// Calculate phash only
+	// Calculate phash and color histogram
 	if err := ic.calculatePhash(); err != nil {
+		return nil, err
+	}
+	if err := ic.calculateColorHistogram(); err != nil {
 		return nil, err
 	}
 
@@ -94,6 +99,40 @@ func (ic *ImageComparator) calculatePhash() error {
 	return nil
 }
 
+// calculateColorHistogram calculates RGB color histogram
+func (ic *ImageComparator) calculateColorHistogram() error {
+	img, err := loadImage(ic.ImagePath)
+	if err != nil {
+		return err
+	}
+
+	bounds := img.Bounds()
+	histogram := make([]int, 48) // R(16) + G(16) + B(16)
+	totalPixels := 0
+
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			// Convert 16-bit color values to 8-bit
+			rBin := int(r>>8) / 16 // 0-15
+			gBin := int(g>>8) / 16 // 0-15
+			bBin := int(b>>8) / 16 // 0-15
+
+			histogram[rBin]++      // R: 0-15
+			histogram[16+gBin]++   // G: 16-31
+			histogram[32+bBin]++   // B: 32-47
+			totalPixels++
+		}
+	}
+
+	// Normalize (divide by totalPixels * 3 because we count R, G, B separately)
+	for i := 0; i < 48; i++ {
+		ic.ColorHistogram[i] = float64(histogram[i]) / float64(totalPixels*3)
+	}
+
+	return nil
+}
+
 // loadImage loads an image from file
 func loadImage(imagePath string) (image.Image, error) {
 	file, err := os.Open(imagePath)
@@ -127,6 +166,15 @@ func HashSimilarity(hash1, hash2 uint64, bits int) float64 {
 	return (1.0 - float64(hammingDist)/float64(bits)) * 100.0
 }
 
+// ColorHistogramSimilarity calculates color similarity using Bhattacharyya coefficient
+func ColorHistogramSimilarity(hist1, hist2 [48]float64) float64 {
+	bc := 0.0
+	for i := 0; i < 48; i++ {
+		bc += math.Sqrt(hist1[i] * hist2[i])
+	}
+	return bc * 100.0 // Convert to percentage
+}
+
 // Compare compares two images and returns similarity using perceptual hash
 func Compare(imagePath1, imagePath2 string) (float64, error) {
 	img1, err := NewImageComparator(imagePath1)
@@ -142,8 +190,14 @@ func Compare(imagePath1, imagePath2 string) (float64, error) {
 	return QuickCompare(img1, img2), nil
 }
 
-// QuickCompare compares two ImageComparator instances using only perceptual hash
+// QuickCompare compares two ImageComparator instances combining structure and color
 func QuickCompare(img1, img2 *ImageComparator) float64 {
+	// Structure similarity (phash)
 	phashSim := HashSimilarity(img1.Phash, img2.Phash, 64)
-	return phashSim
+
+	// Color similarity (histogram)
+	colorSim := ColorHistogramSimilarity(img1.ColorHistogram, img2.ColorHistogram)
+
+	// Weighted combination
+	return phashSim*Weights["phash"] + colorSim*Weights["color"]
 }

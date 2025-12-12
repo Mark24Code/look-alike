@@ -23,7 +23,7 @@ const QuickCompare: React.FC = () => {
     const [projectSourcePath, setProjectSourcePath] = useState<string>('');
 
     // Export Progress State
-    const [exportProgress, setExportProgress] = useState<{ total: number, processed: number, current: string } | null>(null);
+    const [exportProgress, setExportProgress] = useState<{ total: number, processed: number, current: string, status: string } | null>(null);
     const [isExporting, setIsExporting] = useState(false);
     const exportPathRef = useRef<string>(''); // 使用 ref 存储导出路径，避免闭包问题
 
@@ -296,8 +296,8 @@ const QuickCompare: React.FC = () => {
                 const progress = await getExportProgress(projectId);
                 setExportProgress(progress);
 
-                // Stop polling if export is complete
-                if (progress.processed >= progress.total && progress.total > 0) {
+                // Stop polling if export is complete (check status field)
+                if (progress.status === 'completed' || progress.status === 'no_files') {
                     clearInterval(interval);
 
                     // 延迟1秒后显示完成对话框
@@ -309,23 +309,31 @@ const QuickCompare: React.FC = () => {
                         console.log('Displaying export completion. Path from ref:', exportPathRef.current, 'Display path:', displayPath);
 
                         // 显示导出完成对话框
-                        Modal.success({
-                            title: '导出完成',
-                            width: 600,
-                            content: (
-                                <div>
-                                    <p style={{ marginBottom: 12 }}>图片导出已完成！</p>
-                                    <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 4, wordBreak: 'break-all' }}>
-                                        <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>导出路径：</div>
-                                        <div style={{ fontFamily: 'monospace', fontSize: 13 }}>{displayPath}</div>
+                        if (progress.status === 'completed') {
+                            Modal.success({
+                                title: '导出完成',
+                                width: 600,
+                                content: (
+                                    <div>
+                                        <p style={{ marginBottom: 12 }}>图片导出已完成！</p>
+                                        <div style={{ background: '#f5f5f5', padding: 12, borderRadius: 4, wordBreak: 'break-all' }}>
+                                            <div style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>导出路径：</div>
+                                            <div style={{ fontFamily: 'monospace', fontSize: 13 }}>{displayPath}</div>
+                                        </div>
+                                        <p style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
+                                            共处理 {progress.total} 个文件
+                                        </p>
                                     </div>
-                                    <p style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
-                                        共处理 {progress.total} 个文件
-                                    </p>
-                                </div>
-                            ),
-                            okText: '知道了'
-                        });
+                                ),
+                                okText: '知道了'
+                            });
+                        } else if (progress.status === 'no_files') {
+                            Modal.info({
+                                title: '导出提示',
+                                content: '没有可导出的文件',
+                                okText: '知道了'
+                            });
+                        }
 
                         setExportProgress(null);
                     }, 1000);
@@ -342,7 +350,7 @@ const QuickCompare: React.FC = () => {
         // Stop polling after 30 minutes
         setTimeout(() => {
             clearInterval(interval);
-            if (exportProgress && exportProgress.processed < exportProgress.total) {
+            if (exportProgress && exportProgress.status === 'in_progress') {
                 message.warning('导出超时，请检查服务状态');
             }
             setIsExporting(false);

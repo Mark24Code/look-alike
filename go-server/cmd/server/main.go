@@ -30,6 +30,13 @@ func main() {
 		// Try relative to working directory
 		dbPath = "db/look_alike.sqlite3"
 	}
+
+	// Ensure database directory exists
+	dbDir := filepath.Dir(dbPath)
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		log.Fatalf("Failed to create database directory: %v", err)
+	}
+
 	log.Printf("Database path: %s", dbPath)
 
 	// Initialize database

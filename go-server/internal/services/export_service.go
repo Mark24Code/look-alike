@@ -70,9 +70,25 @@ func (svc *ExportService) Process() error {
 		return err
 	}
 
-	log.Printf("Exporting %d source files", len(sourceFiles))
+	total := len(sourceFiles)
+	log.Printf("Exporting %d source files", total)
+
+	// Write initial progress
+	if err := svc.WriteProgress(total, 0, "Starting export..."); err != nil {
+		log.Printf("[WARN] Failed to write initial progress: %v", err)
+	}
+
+	// If no files to export, mark as completed immediately
+	if total == 0 {
+		if err := svc.WriteProgress(0, 0, "No files to export"); err != nil {
+			log.Printf("[WARN] Failed to write completion progress: %v", err)
+		}
+		log.Println("Export completed: no files to export")
+		return nil
+	}
 
 	// Process each source file
+	processed := 0
 	for _, sf := range sourceFiles {
 		select {
 		case <-svc.ctx.Done():
@@ -84,6 +100,17 @@ func (svc *ExportService) Process() error {
 			log.Printf("[ERROR] Failed to export %s: %v", sf.RelativePath, err)
 			continue
 		}
+
+		processed++
+		// Update progress
+		if err := svc.WriteProgress(total, processed, sf.RelativePath); err != nil {
+			log.Printf("[WARN] Failed to write progress: %v", err)
+		}
+	}
+
+	// Write completion progress
+	if err := svc.WriteProgress(total, processed, "Export completed"); err != nil {
+		log.Printf("[WARN] Failed to write completion progress: %v", err)
 	}
 
 	log.Println("Export completed")
@@ -129,11 +156,14 @@ func (svc *ExportService) exportSourceFile(sf *models.SourceFile) error {
 			continue
 		}
 
-		// Copy/convert file
-		outputPath := filepath.Join(outputDir, fmt.Sprintf("%s_%s%s",
-			filepath.Base(sf.RelativePath[:len(sf.RelativePath)-len(filepath.Ext(sf.RelativePath))]),
-			targetName,
-			filepath.Ext(sf.RelativePath)))
+		// Create target-specific subdirectory
+		targetOutputDir := filepath.Join(outputDir, targetName)
+		if err := os.MkdirAll(targetOutputDir, 0755); err != nil {
+			return err
+		}
+
+		// Use source file name (keep original name, just change extension if needed)
+		outputPath := filepath.Join(targetOutputDir, filepath.Base(sf.RelativePath))
 
 		if err := svc.copyAndConvert(targetPath, outputPath, filepath.Ext(sf.RelativePath)); err != nil {
 			return err

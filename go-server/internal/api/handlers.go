@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -451,11 +454,42 @@ func GetExportProgress(c *gin.Context) {
 		return
 	}
 
-	// For now, return empty progress
-	// TODO: Implement progress file reading
-	c.JSON(http.StatusOK, gin.H{
-		"total":     0,
-		"processed": 0,
-		"current":   "",
-	})
+	// Determine output path (same logic as NewExportService)
+	outputPath := filepath.Join(filepath.Dir(project.SourcePath), fmt.Sprintf("%s_Output", project.Name))
+	progressFile := filepath.Join(outputPath, ".export_progress.json")
+
+	// Read progress file
+	data, err := os.ReadFile(progressFile)
+	if err != nil {
+		// If file doesn't exist, export hasn't started or completed
+		c.JSON(http.StatusOK, gin.H{
+			"total":     0,
+			"processed": 0,
+			"current":   "",
+			"status":    "not_started",
+		})
+		return
+	}
+
+	var progress map[string]interface{}
+	if err := json.Unmarshal(data, &progress); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse progress"})
+		return
+	}
+
+	// Add status field
+	total := int(progress["total"].(float64))
+	processed := int(progress["processed"].(float64))
+
+	var status string
+	if total == 0 {
+		status = "no_files"
+	} else if processed >= total {
+		status = "completed"
+	} else {
+		status = "in_progress"
+	}
+	progress["status"] = status
+
+	c.JSON(http.StatusOK, progress)
 }

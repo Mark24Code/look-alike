@@ -68,6 +68,6 @@ export const exportProject = async (id: number, usePlaceholder: boolean = true, 
 };
 
 export const getExportProgress = async (id: number) => {
-    const res = await api.get<{ total: number, processed: number, current: string }>(`/projects/${id}/export_progress`);
+    const res = await api.get<{ total: number, processed: number, current: string, status: string }>(`/projects/${id}/export_progress`);
     return res.data;
 };

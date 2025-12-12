@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -273,8 +274,14 @@ func processSourceFile(fullPath, basePath string, projectID uint) (*models.Sourc
 		return nil, err
 	}
 
-	// Calculate phash only
+	// Calculate phash and color histogram
 	comparator, err := image.NewImageComparator(fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert color histogram to JSON
+	histogramJSON, err := json.Marshal(comparator.ColorHistogram)
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +303,7 @@ func processSourceFile(fullPath, basePath string, projectID uint) (*models.Sourc
 		Phash:        fmt.Sprintf("%d", comparator.Phash),
 		Ahash:        "", // Not used
 		Dhash:        "", // Not used
-		Histogram:    "", // Not used
+		Histogram:    string(histogramJSON),
 	}
 
 	return sourceFile, nil
@@ -314,8 +321,14 @@ func processTargetFile(fullPath, basePath string, targetID uint) (*models.Target
 		return nil, err
 	}
 
-	// Calculate phash only
+	// Calculate phash and color histogram
 	comparator, err := image.NewImageComparator(fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert color histogram to JSON
+	histogramJSON, err := json.Marshal(comparator.ColorHistogram)
 	if err != nil {
 		return nil, err
 	}
@@ -335,7 +348,7 @@ func processTargetFile(fullPath, basePath string, targetID uint) (*models.Target
 		Phash:           fmt.Sprintf("%d", comparator.Phash),
 		Ahash:           "", // Not used
 		Dhash:           "", // Not used
-		Histogram:       "", // Not used
+		Histogram:       string(histogramJSON),
 	}
 
 	return targetFile, nil

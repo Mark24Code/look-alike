@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strconv"
@@ -309,7 +310,7 @@ func (svc *ComparisonService) applyAdaptiveThreshold(candidates []candidateScore
 	return result
 }
 
-// calculateSimilarityFromHashes calculates similarity using pre-computed phash only
+// calculateSimilarityFromHashes calculates similarity using phash and color histogram
 func calculateSimilarityFromHashes(source *models.SourceFile, target *models.TargetFile) float64 {
 	// Parse phash from strings
 	sourcePhash, _ := strconv.ParseUint(source.Phash, 10, 64)
@@ -318,7 +319,28 @@ func calculateSimilarityFromHashes(source *models.SourceFile, target *models.Tar
 	// Calculate phash similarity
 	phashSim := image.HashSimilarity(sourcePhash, targetPhash, 64)
 
-	return phashSim
+	// Parse color histograms
+	var sourceHist, targetHist [48]float64
+	if source.Histogram != "" && target.Histogram != "" {
+		var sourceHistSlice, targetHistSlice []float64
+		json.Unmarshal([]byte(source.Histogram), &sourceHistSlice)
+		json.Unmarshal([]byte(target.Histogram), &targetHistSlice)
+
+		// Convert to fixed-size array
+		if len(sourceHistSlice) == 48 && len(targetHistSlice) == 48 {
+			for i := 0; i < 48; i++ {
+				sourceHist[i] = sourceHistSlice[i]
+				targetHist[i] = targetHistSlice[i]
+			}
+		}
+	}
+
+	// Calculate color similarity
+	colorSim := image.ColorHistogramSimilarity(sourceHist, targetHist)
+
+	// Weighted combination
+	weights := image.Weights
+	return phashSim*weights["phash"] + colorSim*weights["color"]
 }
 
 // createAutoSelections creates default selections for rank 1 candidates
